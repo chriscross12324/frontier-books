@@ -1,0 +1,252 @@
+/* General Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: white;
+    color: #333;
+    line-height: 1.6;
+    padding-top: 0;
+    /* For header spacing */
+}
+
+header {
+    width: 100%;
+    background: #333;
+    color: #fff;
+    padding: 0px 0px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+button {
+    border: none;
+    border-radius: 0px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+header nav ul li a:hover {
+    color: #f39c12;
+    /* Bright yellow */
+}
+
+main {
+    padding: 40px 20px;
+    width: 100%;
+}
+
+.product-list {
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 214px);
+    gap: 40px 20px;
+    justify-content: space-around;
+    align-content: space-around;
+}
+
+.product-item {
+    width: 214px;
+    padding: 5px;
+    border: 2px solid #00000012;
+    border-radius: 12px;
+    background-color: #00000012;
+    text-align: start;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.product-item div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+}
+
+.book-title {
+    font-weight: bold;
+}
+
+.product-item img {
+    width: 200px;
+    height: 300px;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+    object-fit: cover;
+}
+
+.book-price-container {
+    height: 40px;
+    background-color: #ff712ac5;
+    padding: 5px 10px;
+    border-radius: 3px 3px 8px 3px;
+}
+
+.book-price-text {
+    font-size: 0.9rem;
+    color: white;
+    font-weight: bold;
+    max-lines: 3;
+}
+
+.book-title {
+    font-size: 0.9rem;
+    color: black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.button-add {
+    background: #121212;
+    border-radius: 3px 3px 3px 8px;
+    /* Bright yellow */
+    color: white;
+    padding: auto 5px;
+    height: 40px;
+    width: auto;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.product-item button:hover {
+    background-color: #e67e22;
+    /* Darker orange-yellow */
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    padding: 25px;
+    text-align: center;
+    font-size: 1rem;
+    margin-top: 50px;
+    border-top: 4px solid #f39c12;
+}
+
+.cart-containers {
+    max-width: 800px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cart-title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.cart-item-controls {
+    min-width: 240px;
+}
+
+.cart-item img {
+    width: 60px;
+    height: auto;
+    border-radius: 5px;
+    margin-right: 15px;
+}
+
+.cart-item-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.cart-item h3 {
+    font-size: 1.2rem;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.cart-item p {
+    font-size: 1rem;
+    color: #e74c3c;
+    margin: 0;
+}
+
+.remove-button {
+    height: 35px;
+    background: #e74c3c;
+    color: white;
+    padding: 8px 12px;
+}
+
+.remove-button:hover {
+    background: #c0392b;
+}
+
+.decrease-quantity-button,
+.increase-quantity-button {
+    height: 35px;
+    width: 35px;
+}
+
+.item-quantity {
+    height: 35px;
+    width: 70px;
+    border: none;
+    border-bottom: 3px solid rgba(0, 0, 0, 0.15);
+    border-radius: 10px;
+    text-align: center;
+}
+
+.cart-total {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: right;
+    color: #2c3e50;
+}
+
+.clear-cart {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background: #f39c12;
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.clear-cart:hover {
+    background: #e67e22;
+}
+
+.divider {
+    display: inline-block;
+    height: 20px;
+    width: 2px;
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 1px;
+    margin: 0 2px;
+    vertical-align: middle;
+}

@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router'
 import './index.css'
-import App from './App.jsx'
+import './styles.css'
 import Checkout from './pages/Checkout.jsx'
 import Contact from './pages/Contact.jsx'
 import Home from './pages/Home.jsx'
@@ -20,10 +20,4 @@ createRoot(root).render(
       <Route path='/register' element={<Register />} />
     </Routes>
   </BrowserRouter>
-)
-
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
 )
