@@ -52,7 +52,7 @@ const HomePage = () => {
 
     return (
         <div className="main">
-            <Header />
+            <Header cart={cart} />
             <section className="product-list">
                 {books.map((book, index) => (
                     <article key={index} className="product-item">
