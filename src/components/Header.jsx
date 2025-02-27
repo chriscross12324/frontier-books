@@ -1,8 +1,11 @@
-import { FiShoppingCart } from "react-icons/fi";
-import '../css/header.css'
-import { useEffect, useState, useRef } from "react";
+import { FiShoppingCart, FiTrash2 } from "react-icons/fi";
+import styles from '../css/header.module.css'
+import { useEffect, useState, useRef, useContext } from "react";
+import CartItem from "./CartItem";
+import { CartContext } from "../services/CartContext";
 
-const Header = ({ cart }) => {
+const Header = () => {
+    const { cart } = useContext(CartContext);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const cartRef = useRef(null);
 
@@ -21,32 +24,30 @@ const Header = ({ cart }) => {
     }, [isCartOpen]);
 
     return (
-        <header className="header">
-            <div>
-                <div className="logo">Frontier Books</div>
+        <header className={styles.header}>
+            <div className={styles.header_left}>
+                <div className={styles.logo}>Frontier Books</div>
                 <nav>
                     <a href="/">Home</a>
                     <a href="/contact">Contact Us</a>
                 </nav>
             </div>
             
-            <div className="header-right">
-                <div className="cart-container">
-                    <button className="cart-button" onClick={toggleCart}>
-                        <FiShoppingCart className="icon cart" />
-                        <a className="cart-text" href="#">Cart 0</a>
+            <div className={styles.header_right}>
+                <div className={styles.cart_container}>
+                    <button className={styles.cart_button} onClick={toggleCart}>
+                        <FiShoppingCart className={styles.icon} />
+                        <a className={styles.cart_text} href="#">Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</a>
                     </button>
                     
                     {isCartOpen && (
-                        <div className="cart-dropdown">
-                            <h3>Your Cart</h3>
+                        <div className={styles.cart_dropdown}>
+                            <h3>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</h3>
                             {cart.length > 0 ? (
                                 <ul>
                                     {cart.map((item, index) => (
                                         <li key={index}>
-                                            <img src={item.image} alt={item.title} className="cart-item-image" />
-                                            <span>{item.title} x{item.quantity}</span>
-                                            <span>${(item.price * item.quantity).toFixed(2)}</span>
+                                            <CartItem cartItem={item} />
                                         </li>
                                     ))}
                                 </ul>
@@ -57,10 +58,10 @@ const Header = ({ cart }) => {
                     )}
                 </div>
                 
-                <a href="/login" className="sign-in">Sign In</a>
+                <a href="/login" className={styles.sign_in}>Sign In</a>
             </div>
 
-            {isCartOpen && <div className="overlay" onClick={() => setIsCartOpen(false)}></div>}
+            {isCartOpen && <div className={styles.overlay} onClick={() => setIsCartOpen(false)}></div>}
         </header>
     );
 };

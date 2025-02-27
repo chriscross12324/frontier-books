@@ -1,0 +1,101 @@
+.item_card {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border: 1.5px solid #e9e9e9;
+    border-radius: 8px;
+    padding: 4px 8px 0 4px;
+    background-color: white;
+    gap: 8px;
+}
+
+.item_info {
+    display: flex;
+    gap: 18px;
+}
+
+.item_image {
+    width: 50px;
+    height: 75px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.item_footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+.item_author {
+    font-size: 12px;
+    font-weight: normal;
+    color: #777;
+    flex: 1;
+}
+
+.item_title {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.1;
+    color: black;
+    flex: 1;
+}
+
+.quantity_pricing {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.quantity_controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.decrease_quantity_button, .increase_quantity_button {
+    height: 30px;
+    width: 30px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f3f3f3;
+    cursor: pointer;
+    color: black;
+    
+}
+
+.decrease_quantity_button:hover, .increase_quantity_button:hover {
+    background-color: #e2e2e2;
+}
+
+.item_quantity {
+    height: 30px;
+    width: 60px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f3f3f3;
+    text-align: center;
+}
+
+.item_price {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.remove_button {
+    height: 25px;
+    width: 25px;
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    color: #777;
+    cursor: pointer;
+}
+
+.remove_button:hover {
+    color: red;
+}

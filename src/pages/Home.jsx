@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
-import '../styles.css'
+import styles from '../css/home.module.css'
+import { CartContext } from "../services/CartContext";
 
 const books = [
     { image: "https://ew.com/thmb/hqQXu21KjjRzkkjtxaOELhKwvxE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/HeirtoTheEmpirebyTimothyZahn112823-9af44d6adf5c4e16960101de9fb4e7dc.JPG", title: "Heir to the Empire (Star Wars: The Thrawn Trilogy, Vol. 1)", price: 53.74 },
@@ -25,44 +26,21 @@ const books = [
 ]
 
 const HomePage = () => {
-    const [cart, setCart] = useState([])
-
-    useEffect(() => {
-        const storedCart = JSON.parse(localStorage.getItem('cart')) || [];
-        setCart(storedCart);
-    }, []);
-
-    useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
-
-    const addToCart = (book) => {
-        setCart((prevCart) => {
-            const updatedCart = [...prevCart];
-            const existingItem = updatedCart.find((item) => item.title === book.title);
-
-            if (existingItem) {
-                existingItem.quantity++;
-            } else {
-                updatedCart.push({ ...book, quantity: 1 });
-            }
-            return updatedCart;
-        });
-    };
+    const { cart, addToCart } = useContext(CartContext);
 
     return (
         <div className="main">
-            <Header cart={cart} />
-            <section className="product-list">
+            <Header />
+            <section className={styles.product_list}>
                 {books.map((book, index) => (
-                    <article key={index} className="product-item">
-                        <img className="product-image" src={book.image} alt={book.title}></img>
-                        <p className="book-title">{book.title}</p>
-                        <p className="book-author">by: Author</p>
+                    <article key={index} className={styles.product_item}>
+                        <img className={styles.product_image} src={book.image} alt={book.title}></img>
+                        <p className={styles.book_title}>{book.title}</p>
+                        <p className={styles.book_author}>by: Author</p>
                         <div>
-                            <button className="button-add" onClick={() => addToCart(book)}>Add to Cart</button>
-                            <div className="book-price-container">
-                                <p className="book-price-text">${book.price.toFixed(2)}</p>
+                            <button className={styles.button_add} onClick={() => addToCart(book)}>Add to Cart</button>
+                            <div className={styles.book_price_container}>
+                                <p className={styles.book_price_text}>${book.price.toFixed(2)}</p>
                             </div>
                         </div>
                     </article>

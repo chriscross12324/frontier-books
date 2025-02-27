@@ -1,0 +1,48 @@
+/*body {
+    background-image: url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1828&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    margin: 0 auto;
+}*/
+
+.login-container {
+    height: 350px;
+    width: 400px;
+    padding: 20px;
+    margin: auto;
+    background-color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(0, 0, 0, 0.25);
+    border-radius: 25px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
+}
+
+h1 {
+    font-size:xx-large;
+    font-weight: bold;
+}
+
+h2 {
+    font-size: large;
+    font-weight: normal;
+    color: rgba(0, 0, 0, 0.5);
+}
+
+h3 {
+    font-size: small;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.75);
+}
+
+input {
+    height: 40px;
+    width: 100%;
+    background-color: white;
+    color: #000;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    padding: 10px;
+}

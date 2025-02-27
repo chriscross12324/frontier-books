@@ -1,0 +1,95 @@
+.product_list {
+    padding: 40px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 214px);
+    gap: 40px 20px;
+    justify-content: space-around;
+    align-content: space-around;
+}
+
+.product_item {
+    width: 214px;
+    padding: 5px;
+    border: 2px solid #00000012;
+    border-radius: 12px;
+    background-color: #00000012;
+    text-align: start;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.product_item div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+}
+
+.book_title {
+    font-weight: bold;
+}
+
+.product_item img {
+    width: 200px;
+    height: 300px;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+    object-fit: cover;
+}
+
+.book_price_container {
+    height: 40px;
+    background-color: #ff712ac5;
+    padding: 5px 10px;
+    border-radius: 3px 3px 8px 3px;
+}
+
+.book_price_text {
+    font-size: 0.9rem;
+    color: white;
+    font-weight: bold;
+    max-lines: 3;
+}
+
+.book_title {
+    font-size: 0.9rem;
+    color: black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.button_add {
+    background: #121212;
+    border: none;
+    border-radius: 3px 3px 3px 8px;
+    /* Bright yellow */
+    color: white;
+    height: 40px;
+    width: 120px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.product_item button:hover {
+    background-color: #e67e22;
+    /* Darker orange-yellow */
+}
+
+.cart_containers {
+    max-width: 800px;
+    margin: 50px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cart_title {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
