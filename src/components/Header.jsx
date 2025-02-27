@@ -49,7 +49,7 @@ const Header = () => {
                                 </button>
                             </div>
                             {cart.length > 0 ? (
-                                <ul>
+                                <ul className={styles.list_cart}>
                                     {cart.map((item, index) => (
                                         <li key={index}>
                                             <CartItem cartItem={item} />

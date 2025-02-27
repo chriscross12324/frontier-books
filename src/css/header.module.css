@@ -94,10 +94,12 @@ a {
     z-index: 10;
 }
 
-.cart_dropdown ul {
+.list_cart {
+    max-height: 70vh;
+    overflow-y: auto;
     list-style: none;
     padding: 0;
-    margin: 0;
+    margin-bottom: 8px;
 }
 
 .cart_dropdown li {
