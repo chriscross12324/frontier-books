@@ -57,19 +57,25 @@
     gap: 2px;
 }
 
-.decrease_quantity_button, .increase_quantity_button {
+.button_change_quantity {
     height: 30px;
     width: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: rgba(0, 0, 0, 0.01);
     cursor: pointer;
     color: black;
-    
 }
 
-.decrease_quantity_button:hover, .increase_quantity_button:hover {
+.button_change_quantity:hover {
     background-color: rgba(0, 0, 0, 0.05);
+}
+
+.icon_change_quantity {
+    font-size: 18px;
 }
 
 .item_quantity {
@@ -89,6 +95,9 @@
 .remove_button {
     height: 25px;
     width: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: transparent;
     border: none;
     border-radius: 4px;

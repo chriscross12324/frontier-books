@@ -1,4 +1,4 @@
-import { FiShoppingCart, FiTrash2 } from "react-icons/fi";
+import { IoClose, IoCartOutline } from "react-icons/io5";
 import styles from '../css/header.module.css'
 import { useEffect, useState, useRef, useContext } from "react";
 import CartItem from "./CartItem";
@@ -36,13 +36,18 @@ const Header = () => {
             <div className={styles.header_right}>
                 <div className={styles.cart_container}>
                     <button className={styles.cart_button} onClick={toggleCart}>
-                        <FiShoppingCart className={styles.icon} />
+                        <IoCartOutline className={styles.icon} />
                         <a className={styles.cart_text} href="#">Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</a>
                     </button>
                     
                     {isCartOpen && (
                         <div className={styles.cart_dropdown}>
-                            <h3>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</h3>
+                            <div className={styles.cart_header}>
+                                <h3 className={styles.cart_title}>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</h3>
+                                <button className={styles.button_close_cart} onClick={() => setIsCartOpen(false)}>
+                                    <IoClose className={styles.icon_close_cart}/>
+                                </button>
+                            </div>
                             {cart.length > 0 ? (
                                 <ul>
                                     {cart.map((item, index) => (

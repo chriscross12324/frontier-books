@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { FiTrash2 } from "react-icons/fi";
+import { IoAdd, IoRemove, IoTrashOutline } from "react-icons/io5";
 import { CartContext } from "../services/CartContext";
 import styles from '../css/cart-item.module.css'
 
@@ -21,13 +21,13 @@ export default function CartItem({ cartItem }) {
                 
                 <div className={styles.quantity_pricing}>
                     <div className={styles.quantity_controls}>
-                        <button className={styles.decrease_quantity_button} onClick={() => updateQuantity(cartItem.title, cartItem.quantity - 1)}>-</button>
+                        <button className={styles.button_change_quantity} onClick={() => updateQuantity(cartItem.title, cartItem.quantity - 1)}><IoRemove className={styles.icon_change_quantity}/></button>
                         <input type="text" className={styles.item_quantity} value={cartItem.quantity} min="1"></input>
-                        <button className={styles.increase_quantity_button} onClick={() => updateQuantity(cartItem.title, cartItem.quantity + 1)}>+</button>
+                        <button className={styles.button_change_quantity} onClick={() => updateQuantity(cartItem.title, cartItem.quantity + 1)}><IoAdd className={styles.icon_change_quantity}/></button>
                     </div>
                     <p className={styles.item_price}>${(cartItem.price * cartItem.quantity).toFixed(2)}</p>
                 </div>
-                <button class={styles.remove_button} onClick={() => removeItem(cartItem.title)}><FiTrash2 /></button>
+                <button class={styles.remove_button} onClick={() => removeItem(cartItem.title)}><IoTrashOutline /></button>
             </div>
         </div>
     );
