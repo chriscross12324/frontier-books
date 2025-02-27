@@ -61,7 +61,7 @@ const Header = () => {
                                     <p className={styles.empty_cart_text}>Your cart is empty.</p>
                                 </div>
                             )}
-                            {cart.length > 0 && <button className={styles.button_checkout}>Checkout</button>}
+                            {cart.length > 0 && <button className={styles.button_checkout}>Checkout (${(cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2)})</button>}
                         </div>
                     )}
                 </div>
