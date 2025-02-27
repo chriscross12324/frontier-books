@@ -52,8 +52,11 @@ const Header = () => {
                                     ))}
                                 </ul>
                             ) : (
-                                <p>Your cart is empty.</p>
+                                <div className={styles.cart_empty_container}>
+                                    <p className={styles.empty_cart_text}>Your cart is empty.</p>
+                                </div>
                             )}
+                            {cart.length > 0 && <button className={styles.button_checkout}>Checkout</button>}
                         </div>
                     )}
                 </div>
