@@ -12,7 +12,7 @@
     background-color: rgba(0, 0, 0, 0.75);
     color: white;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 8px;
     opacity: 0.9;
     transition: opacity 0.3s ease-in-out;
     min-width: 200px;

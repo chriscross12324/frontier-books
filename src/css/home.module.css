@@ -15,8 +15,7 @@
     background-color: #00000005;
     text-align: start;
     overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.1);
 }
 
 .product_item div {
@@ -28,6 +27,7 @@
 
 .book_title {
     font-weight: bold;
+    cursor: auto;
 }
 
 .product_item img {
@@ -36,13 +36,13 @@
     border-radius: 8px;
     transition: transform 0.3s ease;
     object-fit: cover;
+    cursor: pointer;
 }
 
 .book_price_container {
     height: 30px;
     background-color: rgba(0, 129, 13, 0.25);
     padding: 5px 10px;
-    border: 1.5px solid rgba(0, 129, 13, 0.25);
     border-radius: 15px;
 }
 
