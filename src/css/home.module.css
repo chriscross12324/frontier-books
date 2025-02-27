@@ -10,9 +10,9 @@
 .product_item {
     width: 214px;
     padding: 5px;
-    border: 2px solid #00000012;
+    border: 2px solid #00000010;
     border-radius: 12px;
-    background-color: #00000012;
+    background-color: #00000005;
     text-align: start;
     overflow: hidden;
     transition: transform 0.3s ease, box-shadow 0.3s ease;

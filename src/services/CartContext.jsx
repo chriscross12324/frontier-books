@@ -29,13 +29,19 @@ export const CartProvider = ({ children }) => {
     };
 
     const updateQuantity = (id, newQuantity) => {
+        if (newQuantity === 0) {
+            removeItem(id);
+        }
+
         setCart((prevCart) => prevCart.map(item =>
             item.title === id ? { ...item, quantity: newQuantity } : item
         ));
     };
 
     const removeItem = (id) => {
-        setCart((prevCart) => prevCart.filter(item => item.title !== id));
+        if (confirm("Are you sure you want to remove this item?")) {
+            setCart((prevCart) => prevCart.filter(item => item.title !== id));
+        }
     };
 
     return (

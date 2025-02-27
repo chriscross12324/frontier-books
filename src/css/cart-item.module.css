@@ -62,14 +62,14 @@
     width: 30px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f3f3f3;
+    background-color: rgba(0, 0, 0, 0.01);
     cursor: pointer;
     color: black;
     
 }
 
 .decrease_quantity_button:hover, .increase_quantity_button:hover {
-    background-color: #e2e2e2;
+    background-color: rgba(0, 0, 0, 0.05);
 }
 
 .item_quantity {
@@ -77,7 +77,7 @@
     width: 60px;
     border: 1px solid #ddd;
     border-radius: 8px;
-    background-color: #f3f3f3;
+    background-color: rgba(0, 0, 0, 0.01);
     text-align: center;
 }
 
@@ -97,5 +97,6 @@
 }
 
 .remove_button:hover {
+    background-color: rgba(255, 0, 0, 0.1);
     color: red;
 }

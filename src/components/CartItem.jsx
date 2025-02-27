@@ -21,13 +21,13 @@ export default function CartItem({ cartItem }) {
                 
                 <div className={styles.quantity_pricing}>
                     <div className={styles.quantity_controls}>
-                        <button className={styles.decrease_quantity_button}>-</button>
-                        <input type="text" className={styles.item_quantity} value="1" min="1"></input>
-                        <button className={styles.increase_quantity_button}>+</button>
+                        <button className={styles.decrease_quantity_button} onClick={() => updateQuantity(cartItem.title, cartItem.quantity - 1)}>-</button>
+                        <input type="text" className={styles.item_quantity} value={cartItem.quantity} min="1"></input>
+                        <button className={styles.increase_quantity_button} onClick={() => updateQuantity(cartItem.title, cartItem.quantity + 1)}>+</button>
                     </div>
-                    <p className={styles.item_price}>${cartItem.price * cartItem.quantity}</p>
+                    <p className={styles.item_price}>${(cartItem.price * cartItem.quantity).toFixed(2)}</p>
                 </div>
-                <button class={styles.remove_button}><FiTrash2 /></button>
+                <button class={styles.remove_button} onClick={() => removeItem(cartItem.title)}><FiTrash2 /></button>
             </div>
         </div>
     );
