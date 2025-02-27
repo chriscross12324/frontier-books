@@ -39,25 +39,38 @@
 }
 
 .book_price_container {
-    height: 40px;
-    background-color: #ff712ac5;
+    height: 30px;
+    background-color: rgba(0, 129, 13, 0.25);
     padding: 5px 10px;
-    border-radius: 3px 3px 8px 3px;
+    border: 1.5px solid rgba(0, 129, 13, 0.25);
+    border-radius: 15px;
 }
 
 .book_price_text {
     font-size: 0.9rem;
-    color: white;
+    color: black;
     font-weight: bold;
     max-lines: 3;
 }
 
 .book_title {
-    font-size: 0.9rem;
+    font-size: 16px;
+    line-height: 1.0;
     color: black;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    margin-bottom: 4px;
+}
+
+.book_author {
+    font-size: 14px;
+    line-height: 1.0;
+    color: black;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 8px;
 }
 
 .button_add {
@@ -73,7 +86,7 @@
 }
 
 .product_item button:hover {
-    background-color: #e67e22;
+    background-color: rgba(0, 129, 13, 1.0);
     /* Darker orange-yellow */
 }
 

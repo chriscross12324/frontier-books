@@ -51,7 +51,8 @@ a {
 }
 
 .cart_container {
-    background-color: #ff712ac5;
+    height: 30px;
+    background-color: rgba(0, 129, 13, 0.5);
     align-items: center;
     border-radius: 20px;
     display: flex;
@@ -131,10 +132,14 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: rgba(0, 0, 0, 0.05);
     border: none;
     border-radius: 15px;
     cursor: pointer;
+}
+
+.button_close_cart:hover {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .icon_close_cart {
@@ -145,13 +150,14 @@ a {
 
 .cart_empty_container {
     height: 100px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
     align-content: center;
 }
 
 .empty_cart_text {
-    color: rgba(0, 0, 0, 0.3);
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: bold;
     text-align: center;
 }
 
