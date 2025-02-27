@@ -26,11 +26,6 @@ header {
     z-index: 100;
 }
 
-header nav ul li a:hover {
-    color: #f39c12;
-    /* Bright yellow */
-}
-
 main {
     padding: 40px 20px;
     width: 100%;

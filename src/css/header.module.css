@@ -10,7 +10,7 @@
 .header_left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
 }
 
 .logo {
@@ -23,7 +23,6 @@
 
 .header nav {
     display: flex;
-    gap: 10px;
     margin-left: 10px;
 }
 
@@ -33,15 +32,10 @@ a {
     font-weight: 500;
 }
 
-.nav a:first-child {
-    border-bottom: 2px solid black;
-    padding-bottom: 5px;
-}
-
 .header_right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 5px;
 }
 
 .icon {
