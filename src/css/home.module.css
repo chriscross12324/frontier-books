@@ -83,6 +83,7 @@
     width: 120px;
     font-size: 0.8rem;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .product_item button:hover {

@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import Header from "../components/Header";
 import styles from '../css/home.module.css'
 import { CartContext } from "../services/CartContext";
+import { useNotification } from "../components/Notification";
 
 const books = [
     { image: "https://ew.com/thmb/hqQXu21KjjRzkkjtxaOELhKwvxE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/HeirtoTheEmpirebyTimothyZahn112823-9af44d6adf5c4e16960101de9fb4e7dc.JPG", title: "Heir to the Empire (Star Wars: The Thrawn Trilogy, Vol. 1)", price: 53.74 },
@@ -27,6 +28,7 @@ const books = [
 
 const HomePage = () => {
     const { cart, addToCart } = useContext(CartContext);
+    const { showNotification } = useNotification();
 
     return (
         <div className="main">
@@ -38,7 +40,7 @@ const HomePage = () => {
                         <p className={styles.book_title}>{book.title}</p>
                         <p className={styles.book_author}>by: Author</p>
                         <div>
-                            <button className={styles.button_add} onClick={() => addToCart(book)}>Add to Cart</button>
+                            <button className={styles.button_add} onClick={() => {addToCart(book); showNotification("Added to cart!")}}>Add to Cart</button>
                             <div className={styles.book_price_container}>
                                 <p className={styles.book_price_text}>${book.price.toFixed(2)}</p>
                             </div>
