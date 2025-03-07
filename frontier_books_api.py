@@ -86,7 +86,7 @@ class CartItem(BaseModel):
 class Order(BaseModel):
     id: int
     user_id: int
-    total_amount: int
+    total_amount: float
     order_status: str
     created_at: datetime
 
@@ -195,7 +195,7 @@ async def add_to_cart(item: CartItem, db=Depends(get_db)):
 @app.get("/cart/{user_id}")
 async def get_cart(user_id: int, db=Depends(get_db)):
     items = await db.fetch(
-        "SELECT b.title, b.author, c.quantity, b.price FROM cart_items c JOIN books b ON c.book_id = b.id WHERE c.user_id = $1",
+        "SELECT b.title, b.author, c.quantity, b.price FROM cart_items c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = $1",
         user_id
     )
     if not items:
@@ -206,6 +206,7 @@ async def get_cart(user_id: int, db=Depends(get_db)):
 ## Checkout Endpoints
 @app.post("/checkout/")
 async def checkout(order: Order, db=Depends(get_db)):
+    total_amount = sum()
     await db.execute(
         "INSERT INTO orders (user_id, total_amount, order_status, created_at) VALUES ($1, $2, 'Completed', $3)",
         order.user_id, order.total_amount, datetime.now(timezone.utc)
@@ -215,7 +216,10 @@ async def checkout(order: Order, db=Depends(get_db)):
 
 @app.get("/orders/{user_id}")
 async def get_orders(user_id: int, db=Depends(get_db)):
-    orders = db.fetch("SELECT * FROM orders WHERE user_id = $1", user_id)
+    try:
+        orders = await db.fetch("SELECT * FROM orders WHERE user_id = $1", user_id)
+    except Exception as e:
+        print(f"Failed: {str(e)}")
     if not orders:
         raise HTTPException(status_code=404, detail="No orders found for this user")
     return {"orders": orders}
@@ -233,7 +237,7 @@ async def create_review(review: Review, db=Depends(get_db)):
 @app.get("/reviews/{book_id}")
 async def get_reviews(book_id: int, db=Depends(get_db)):
     reviews = await db.fetch(
-        "SELECT u.username, r.rating, r.review_text FROM reviews r JOIN users u ON r.user_id = u.id WHERE r.book_id = $1",
+        "SELECT u.username, r.rating, r.review_text FROM reviews r JOIN users u ON r.user_id = u.user_id WHERE r.book_id = $1",
         book_id
     )
     if not reviews:
