@@ -189,7 +189,7 @@ def hash_password(plaintext_password: str) -> str:
 # API Endpoints
 # ========================================
 
-# --- User ---
+# --- Create a New User Account ---
 @app.post("/users")
 async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
     try:
@@ -219,7 +219,7 @@ async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
     except asyncpg.UniqueViolationError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error Creating User: Email already registered"
+            detail="Error Creating User: Violation Error"
         )
     
     except asyncpg.PostgresError as e:
@@ -234,6 +234,7 @@ async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
             detail=f"Error Creating User: {str(e)}"
         )
 
+# --- Login to an Account ---
 @app.post("/login")
 async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
     try:
@@ -283,62 +284,175 @@ async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
             detail=f"Error Logging In User: {str(e)}"
         )
     
+# --- Add a New Book to the Store ---
+@app.post("/books")
+async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_connection)):
+    try:
+        user = decode_access_token(access_token)
+        if not user['user_role'] == 'admin':
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Error Adding Book: Unauthorized"
+            )
 
+        async with db.transaction():
+            result = await db.execute(
+                "INSERT INTO books (title, author, description, price, cover_image_url, created_at) "
+                "VALUES ($1, $2, $3, $4, $5, $6) RETURNING book_id",
+                book_data.book_title, book_data.book_author, book_data.book_description, 
+                book_data.book_price, book_data.book_cover_image_url, datetime.now(timezone.utc)
+            )
 
+        # Retrieve book id from result
+        book_id = result[0]['book_id']
 
+        # Return success message and book id
+        return {
+            "message": f"Book added successfully {str(book_id)}"
+        }
 
-
-## Book Endpoints
-@app.post("/books/")
-async def create_book(book: Post_Book, db=Depends(lease_db_connection)):
-    await db.execute(
-        "INSERT INTO books (title, author, description, price, cover_image_url, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
-        book.title, book.author, book.description, book.price, book.cover_image_url, datetime.now(timezone.utc)
-    )
-    return {"message": "Book added successfully"}
-
-@app.get("/books/")
-async def get_books(db=Depends(lease_db_connection)):
-    books = await db.fetch("SELECT * from books ORDER BY RANDOM()")
-    return {"books": books}
-
-@app.get("/book/{book_id}")
-async def get_book(book_id: int, db=Depends(lease_db_connection)):
-    book = await db.fetch("SELECT * from books WHERE book_id = $1", book_id)
-    if book is None:
-        raise HTTPException(status_code=404, detail="Book not found")
-    return {"book": book}
-
-
-## Cart Endpoints
-@app.post("/cart/")
-async def add_to_cart(item: General_CartItem, db=Depends(lease_db_connection)):
-    existing = await db.fetchrow(
-        "SELECT quantity FROM cart_items WHERE user_id = $1 AND book_id = $2", item.user_id, item.book_id
-    )
-
-    if existing:
-        await db.execute(
-            "UPDATE cart_items SET quantity = quantity + $1 WHERE user_id = $2 AND book_id = $3",
-            item.quantity, item.user_id, item.book_id
+    except asyncpg.UniqueViolationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error Adding Book: Violation Error"
         )
-    else:
-        await db.execute(
-            "INSERT INTO cart_items (user_id, book_id, quantity, added_at) VALUES ($1, $2, $3, $4)",
-            item.user_id, item.book_id, item.quantity, datetime.now(timezone.utc)
+    
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Adding Book: Database Error ({str(e)})"
         )
-    return {"message": "Item added to cart"}
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Adding Book: {str(e)}"
+        )
 
-@app.get("/cart/{user_id}")
-async def get_cart(user_id: int, db=Depends(lease_db_connection)):
-    items = await db.fetch(
-        "SELECT b.title, b.author, c.quantity, b.price FROM cart_items c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = $1",
-        user_id
-    )
-    if not items:
-        raise HTTPException(status_code=404, detail="Cart is empty or not found")
-    return {"cart_items": items}
+# --- Retrieve All Books in Random Order ---
+@app.get("/books")
+async def get_all_books(db=Depends(lease_db_connection)):
+    try:
+        all_books = await db.fetch("SELECT * from books ORDER BY RANDOM()")
+        return {
+            "books": all_books
+        }
 
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Books: Database Error ({str(e)})"
+        )
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Books: {str(e)}"
+        )
+
+# --- Retrieve Specific Book's Data ---
+@app.get("/books/{book_id}")
+async def get_book_by_id(book_id: int, db=Depends(lease_db_connection)):
+    try:
+        book = await db.fetch("SELECT * from books WHERE book_id = $1", book_id)
+        if book is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Error Retrieving Book: Book Not Found"
+            )
+
+        return {
+            "book": book
+        }
+
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Book: Database Error ({str(e)})"
+        )
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Book: {str(e)}"
+        )
+
+# --- Update Cart ---
+@app.post("/cart")
+async def update_cart(cart_items: Post_Cart, access_token: str, db=Depends(lease_db_connection)):
+    try:
+        # Get requesting user's id
+        user = decode_access_token(access_token)
+        user_id = user['user_id']
+
+        async with db.transaction():
+            await db.execute("DELETE FROM cart_items WHERE user_id = $1", user_id)
+
+            for item in cart_items.items:
+                await db.execute(
+                    """
+                    INSERT INTO cart_items (user_id, book_id, quantity, added_at) 
+                    VALUES ($1, $2, $3, $4)
+                    ON CONFLICT (user_id, book_id)
+                    DO UPDATE SET quantity = EXCLUDED.quantity
+                    """,
+                    user_id, item.book_id, item.book_quantity, datetime.now(timezone.utc)
+                )
+
+        return {
+            "message": "Cart updated successfully"
+        }
+
+    except asyncpg.UniqueViolationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error Updating Cart: Violation Error"
+        )
+    
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Updating Cart: Database Error ({str(e)})"
+        )
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Updating Cart: {str(e)}"
+        )
+
+# --- Get Cart by User ID ---
+@app.get("/cart")
+async def get_cart(access_token: str, db=Depends(lease_db_connection)):
+    try:
+        # Get requesting user's id
+        user = decode_access_token(access_token)
+        user_id = user['user_id']
+
+        items = await db.fetch(
+            "SELECT b.title, b.author, c.quantity, b.price FROM cart_items c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = $1",
+            user_id
+        )
+        
+        if not items:
+            raise HTTPException(
+                status_code=404, 
+                detail="Cart is empty or not found"
+            )
+        
+        return {"cart_items": items}
+    
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Cart: Database Error ({str(e)})"
+        )
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Cart: {str(e)}"
+        )
 
 ## Checkout Endpoints
 @app.post("/checkout/")
