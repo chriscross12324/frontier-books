@@ -1,37 +1,48 @@
-from fastapi import FastAPI, HTTPException, Depends, Request, status
-from fastapi.security import OAuth2PasswordBearer
-from contextlib import asynccontextmanager
-from pydantic import BaseModel
-from datetime import datetime, timedelta, timezone
-import asyncpg
 import asyncio
+import asyncpg
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, timezone
+from fastapi import FastAPI, HTTPException, Depends, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from passlib.context import CryptContext
+from pydantic import BaseModel, Field
 import random
 from typing import List, Optional
-from passlib.context import CryptContext
-from jose import JWTError, jwt
 
 
-# Database Connection Config
+# ========================================
+# Configuration Values
+# ========================================
+
+# --- Database Connection Values ---
 DB_USER = "postgres"
 DB_PASSWORD = "spark"
 DB_NAME = "frontier_books"
 DB_HOST = "localhost"
 DB_PORT = 5432
 
-# Secret Key for JWT
+# --- JWT Values ---
 SECRET_KEY = "your_secret_key"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRATION_DELTA_MINUTES_NEW = 60
+ACCESS_TOKEN_EXPIRATION_DELTA_MINUTES_RETURNING = 45
 
 # Cryptography context for password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 
-# Create Connection Pool on Startup
+# ========================================
+# App & Lifecycle
+# ========================================
+
+# --- Lifecycle ---
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
+        # Create Connection Pool on Startup
         app.state.db_pool = await asyncpg.create_pool(
             user=DB_USER,
             password=DB_PASSWORD,
@@ -41,119 +52,245 @@ async def lifespan(app: FastAPI):
             min_size=2,
             max_size=10
         )
-        print("Database connection pool created successfully.")
-        try:
-            async with app.state.db_pool.acquire() as conn:
-                print("Connection acquired")
-        except Exception as e:
-            print(f"Error acquiring database pool: {str(e)}")
     except Exception as e:
-        print(f"Error creating database pool: {str(e)}")
+        print(f"Error Creating Database Pool: {str(e)}")
     yield
-    print("Closing database pool")
+    print("Closing Database Pool...")
     await app.state.db_pool.close()
-    print("Database connection closed.")
+    print("Database Connection Closed.")
 
 
-# FastAPI App
+# --- FastAPI App ---
 app = FastAPI(lifespan=lifespan, root_path="/frontier_books")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-# Dependency to get a connection from the pool
-async def get_db(request: Request):
-    async with request.app.state.db_pool.acquire() as connection:
-        yield connection
-
+# ========================================
 # Schemas
-class User(BaseModel):
-    username: str
-    email: str
-    password: str
+# ========================================
 
-class Book(BaseModel):
-    id: int
-    title: str
-    author: str
-    description: str
-    price: float
-    cover_image_url: str
+# --- General ---
+class General_User(BaseModel):
+    user_id: Optional[int]
+    user_name: str
+    user_email: str
+    user_password: str
 
-class CartItem(BaseModel):
-    user_id: int
+class General_CartItem(BaseModel):
     book_id: int
-    quantity: int
+    book_quantity: int
 
-class Order(BaseModel):
-    id: int
+# --- GET ---
+class Get_Book(BaseModel):
+    book_id: int
+    book_title: str
+    book_author: str
+    book_description: str
+    book_price: float
+    book_cover_image_url: str
+
+class Get_Cart(BaseModel):
     user_id: int
-    total_amount: float
+    cart_id: int
+    cart_items: List[General_CartItem]
+
+class Get_Order(BaseModel):
+    user_id: int
+    order_id: int
+    order_total_cost: float
     order_status: str
-    created_at: datetime
+    order_checkout_datetime: datetime
+
+class Get_Review(BaseModel):
+    review_user_id: int
+    review_book_id: int
+    review_book_rating: int
+    review_text: str
+
+# --- POST ---
+class Post_Book(BaseModel):
+    book_title: str
+    book_author: str
+    book_description: str
+    book_price: float
+    book_cover_image_url: str
+
+class Post_Cart(BaseModel):
+    cart_items: List[General_CartItem]
+
+class Post_Order(BaseModel):
+    order_items: List[General_CartItem]
+    order_total_cost: float
 
 class Review(BaseModel):
-    user_id: int
-    book_id: int
-    rating: int
+    review_book_id: int
+    review_book_rating: int = Field(..., ge=1, le=5, description="Rating must be between 1 and 5")
     review_text: str
 
 
-# Helper functions for password hashing and JWT token generation
-def verify_password(plain_password: str, hashed_password: str):
-    return pwd_context.verify(plain_password, hashed_password)
+# ========================================
+# Helper Functions
+# ========================================
 
-def get_password_hash(password:str):
-    return pwd_context.hash(password)
+# --- Lease Connection from Database Pool ---
+async def lease_db_connection(request: Request):
+    async with request.app.state.db_pool.acquire() as connection:
+        yield connection
 
-def create_access_token(data: dict, expires_delta: timedelta = timedelta(minutes=15)):
-    to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + expires_delta
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+# --- Create an Access Token to Return to the User ---
+def create_access_token(key_data: dict, expiration_delta: timedelta = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_DELTA_MINUTES_NEW)) -> str:
+    # Copy original key data to modify later
+    key_data_copy = key_data.copy()
 
-def get_user(db, username: str):
-    return db.fetchrow("SELECT * FROM users WHERE username = $1", username)
+    # Calculate the access token's expiration
+    access_token_expiration = datetime.now(timezone.utc) + expiration_delta
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+    # Add the token's expiration to the key data copy
+    key_data_copy.update({"exp": access_token_expiration})
+
+    # Encode the access token
+    encoded_access_token = jwt.encode(key_data_copy, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_access_token
+
+# --- Retrieve User ID and Role from Access Token ---
+def decode_access_token(access_token: str) -> dict:
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-    return username
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: int = payload.get("user_id")
+        user_role: str = payload.get("user_role", "user")
+
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token: Missing User ID")
+        
+        return {"user_id": user_id, "user_role": user_role}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid Token")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error Decoding Access Token: {str(e)}")
+
+# --- Verify Plaintext and Hashed Password Match ---
+def authenticate_password(plaintext_password: str, hashed_password) -> bool:
+    return pwd_context.verify(plaintext_password, hashed_password)
+
+# --- Hash Plaintext Password ---
+def hash_password(plaintext_password: str) -> str:
+    return pwd_context.hash(plaintext_password)
 
 
+# ========================================
 # API Endpoints
-## User Endpoints
-@app.post("/create-user/")
-async def create_user(user: User, db=Depends(get_db)):
-    await db.execute(
-        "INSERT INTO users (username, email, password_hash, created_at) VALUES ($1, $2, $3, $4)",
-        user.username, user.email, get_password_hash(user.password), datetime.now(timezone.utc)
-    )
-    return {"message": "User created successfully"}
+# ========================================
 
-@app.post("/login/")
-async def login_for_access_token(login: User, db=Depends(get_db)):
-    user = await get_user(db, login.username)
-    if user is None or not verify_password(login.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+# --- User ---
+@app.post("/users")
+async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
+    try:
+        async with db.transaction():
+            result = await db.execute(
+                "INSERT INTO users (username, email, password_hash, created_at) "
+                "VALUES ($1, $2, $3, $4) RETURNING user_id",
+                user_data.user_name, user_data.user_email, hash_password(user_data.user_password), datetime.now(timezone.utc)
+            )
 
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(data={"sub": login.username}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer"}
+        # Retrieve user id from result
+        user_id = result[0]['user_id']
+
+        # New account role is 'user'
+        user_role = "user"
+
+        # Create the access token immediately
+        access_token = create_access_token(key_data={"user_id": user_id, "user_role": user_role})
+
+        # Return success message and the access token
+        return {
+            "message": "User created successfully",
+            "access_token": access_token,
+            "token_type": "bearer"
+        }
+    
+    except asyncpg.UniqueViolationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error Creating User: Email already registered"
+        )
+    
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Creating User: Database Error ({str(e)})"
+        )
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Creating User: {str(e)}"
+        )
+
+@app.post("/login")
+async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
+    try:
+        #Check if email and password are provided
+        if not login_data.user_email or not login_data.user_password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error Logging In User: Email and password are required"
+            )
+        
+        # Retrieve the requested user data from the database by email
+        requested_user_data = await db.fetch("SELECT * FROM users WHERE email = $1", login_data.user_email)
+        if requested_user_data is None:
+            # Don't mention the user doesn't exist (Insecure)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Error Logging In User: Invalid credentials"
+            )
+        
+        if not authenticate_password(plaintext_password=login_data.user_password, hashed_password=requested_user_data['password_hash']):
+            # Don't mention which credential is wrong (Insecure)
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Error Logging In User: Invalid credentials"
+            )
+        
+        # Create the access token
+        access_token_expiration_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_DELTA_MINUTES_RETURNING)
+        access_token = create_access_token(key_data={"user_id": requested_user_data['user_id'], "user_role": requested_user_data['user_role']}, expiration_delta=access_token_expiration_delta)
+
+        # Return success message and the access token
+        return {
+            "message": "Login successful",
+            "access_token": access_token,
+            "token_type": "bearer"
+        }
+        
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Logging In User: Database Error ({str(e)})"
+        )
+    
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Logging In User: {str(e)}"
+        )
+    
+
+
+
 
 
 ## Book Endpoints
 @app.post("/books/")
-async def create_book(book: Book, db=Depends(get_db)):
+async def create_book(book: Post_Book, db=Depends(lease_db_connection)):
     await db.execute(
         "INSERT INTO books (title, author, description, price, cover_image_url, created_at) VALUES ($1, $2, $3, $4, $5, $6)",
         book.title, book.author, book.description, book.price, book.cover_image_url, datetime.now(timezone.utc)
@@ -161,12 +298,12 @@ async def create_book(book: Book, db=Depends(get_db)):
     return {"message": "Book added successfully"}
 
 @app.get("/books/")
-async def get_books(db=Depends(get_db)):
-    books = await db.fetch("SELECT * from books")
+async def get_books(db=Depends(lease_db_connection)):
+    books = await db.fetch("SELECT * from books ORDER BY RANDOM()")
     return {"books": books}
 
 @app.get("/book/{book_id}")
-async def get_book(book_id: int, db=Depends(get_db)):
+async def get_book(book_id: int, db=Depends(lease_db_connection)):
     book = await db.fetch("SELECT * from books WHERE book_id = $1", book_id)
     if book is None:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -175,7 +312,7 @@ async def get_book(book_id: int, db=Depends(get_db)):
 
 ## Cart Endpoints
 @app.post("/cart/")
-async def add_to_cart(item: CartItem, db=Depends(get_db)):
+async def add_to_cart(item: General_CartItem, db=Depends(lease_db_connection)):
     existing = await db.fetchrow(
         "SELECT quantity FROM cart_items WHERE user_id = $1 AND book_id = $2", item.user_id, item.book_id
     )
@@ -193,7 +330,7 @@ async def add_to_cart(item: CartItem, db=Depends(get_db)):
     return {"message": "Item added to cart"}
 
 @app.get("/cart/{user_id}")
-async def get_cart(user_id: int, db=Depends(get_db)):
+async def get_cart(user_id: int, db=Depends(lease_db_connection)):
     items = await db.fetch(
         "SELECT b.title, b.author, c.quantity, b.price FROM cart_items c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = $1",
         user_id
@@ -205,7 +342,7 @@ async def get_cart(user_id: int, db=Depends(get_db)):
 
 ## Checkout Endpoints
 @app.post("/checkout/")
-async def checkout(order: Order, db=Depends(get_db)):
+async def checkout(order: Post_Order, db=Depends(lease_db_connection)):
     total_amount = sum()
     await db.execute(
         "INSERT INTO orders (user_id, total_amount, order_status, created_at) VALUES ($1, $2, 'Completed', $3)",
@@ -215,7 +352,7 @@ async def checkout(order: Order, db=Depends(get_db)):
     return {"message": "Order placed successfully"}
 
 @app.get("/orders/{user_id}")
-async def get_orders(user_id: int, db=Depends(get_db)):
+async def get_orders(user_id: int, db=Depends(lease_db_connection)):
     try:
         orders = await db.fetch("SELECT * FROM orders WHERE user_id = $1", user_id)
     except Exception as e:
@@ -227,7 +364,7 @@ async def get_orders(user_id: int, db=Depends(get_db)):
 
 ## Review Endpoints
 @app.post("/reviews/")
-async def create_review(review: Review, db=Depends(get_db)):
+async def create_review(review: Review, db=Depends(lease_db_connection)):
     await db.execute(
         "INSERT INTO reviews (user_id, book_id, rating, review_text, created_at) VALUES ($1, $2, $3, $4, $5)",
         review.user_id, review.book_id, review.rating, review.review_text, datetime.now(timezone.utc)
@@ -235,7 +372,7 @@ async def create_review(review: Review, db=Depends(get_db)):
     return {"message": "Review added"}
 
 @app.get("/reviews/{book_id}")
-async def get_reviews(book_id: int, db=Depends(get_db)):
+async def get_reviews(book_id: int, db=Depends(lease_db_connection)):
     reviews = await db.fetch(
         "SELECT u.username, r.rating, r.review_text FROM reviews r JOIN users u ON r.user_id = u.user_id WHERE r.book_id = $1",
         book_id
@@ -289,8 +426,3 @@ async def fun_random(word_length: int):
     sentence = sentence.capitalize() + '.'
 
     return {"sentence": sentence}
-
-@app.get("/test-db")
-async def test_db(request: Request):
-    async for connection in get_db(request):
-        return {"message": f"Database connection successful: {request.state.__dict__}"}
