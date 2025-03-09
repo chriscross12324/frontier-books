@@ -9,23 +9,24 @@ import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import { CartProvider } from './services/CartContext.jsx'
 import { NotificationProvider } from './components/Notification.jsx'
+import { AuthProvider } from './services/AuthContext.jsx'
 
 const root = document.getElementById('root');
 
 createRoot(root).render(
   <NotificationProvider>
-    <CartProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/checkout' element={<Checkout />} />
-          <Route path='/contact' element={<Contact />} />
-          <Route path='/login' element={<Login />} />
-          <Route path='/register' element={<Register />} />
-        </Routes>
-      </BrowserRouter>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path='/' element={<Home />} />
+            <Route path='/checkout' element={<Checkout />} />
+            <Route path='/contact' element={<Contact />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
+          </Routes>
+        </BrowserRouter>
+      </CartProvider>
+    </AuthProvider>
   </NotificationProvider>
-  
-  
 )
