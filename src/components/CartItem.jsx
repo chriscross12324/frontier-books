@@ -8,7 +8,7 @@ export default function CartItem({ cartItem }) {
 
     return (
         <div className={styles.item_card}>
-            <img src={cartItem.image} alt={cartItem.title} className={styles.item_image} />
+            <img src={cartItem.cover_image_url} alt={cartItem.title} className={styles.item_image} />
             <div className={styles.item_footer}>
                 <div>
                     <h2 className={styles.item_author}>
