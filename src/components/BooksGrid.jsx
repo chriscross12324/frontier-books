@@ -24,7 +24,7 @@ const BooksGrid = () => {
                 <article key={index} className={styles.product_item}>
                     <img className={styles.product_image} src={book.cover_image_url} alt={book.title}></img>
                     <p className={styles.book_title}>{book.title}</p>
-                    <p className={styles.book_author}>by: Author</p>
+                    <p className={styles.book_author}>by: {book.author}</p>
                     <div>
                         <button className={styles.button_add} onClick={() => {addToCart(book); showNotification("Added to cart!")}}>Add to Cart</button>
                         <div className={styles.book_price_container}>
