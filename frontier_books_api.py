@@ -77,7 +77,7 @@ app.add_middleware(
 
 # --- General ---
 class General_User(BaseModel):
-    user_id: Optional[int]
+    user_id: int
     user_name: str
     user_email: str
     user_password: str
@@ -167,7 +167,7 @@ def decode_access_token(access_token: str) -> dict:
 
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token: Missing User ID")
-        
+
         return {"user_id": user_id, "user_role": user_role}
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
@@ -177,7 +177,7 @@ def decode_access_token(access_token: str) -> dict:
         raise HTTPException(status_code=500, detail=f"Error Decoding Access Token: {str(e)}")
 
 # --- Verify Plaintext and Hashed Password Match ---
-def authenticate_password(plaintext_password: str, hashed_password) -> bool:
+def authenticate_password(plaintext_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plaintext_password, hashed_password)
 
 # --- Hash Plaintext Password ---
@@ -215,19 +215,19 @@ async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
             "access_token": access_token,
             "token_type": "bearer"
         }
-    
+
     except asyncpg.UniqueViolationError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error Creating User: Violation Error"
         )
-    
+
     except asyncpg.PostgresError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Creating User: Database Error ({str(e)})"
         )
-    
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -244,26 +244,26 @@ async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Error Logging In User: Email and password are required"
             )
-        
+
         # Retrieve the requested user data from the database by email
-        requested_user_data = await db.fetch("SELECT * FROM users WHERE email = $1", login_data.user_email)
+        requested_user_data = await db.fetchrow("SELECT * FROM users WHERE email = $1", login_data.user_email)
         if requested_user_data is None:
             # Don't mention the user doesn't exist (Insecure)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Error Logging In User: Invalid credentials"
             )
-        
+
         if not authenticate_password(plaintext_password=login_data.user_password, hashed_password=requested_user_data['password_hash']):
             # Don't mention which credential is wrong (Insecure)
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Error Logging In User: Invalid credentials"
             )
-        
+
         # Create the access token
         access_token_expiration_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRATION_DELTA_MINUTES_RETURNING)
-        access_token = create_access_token(key_data={"user_id": requested_user_data['user_id'], "user_role": requested_user_data['user_role']}, expiration_delta=access_token_expiration_delta)
+        access_token = create_access_token(key_data={"user_id": requested_user_data['user_id'], "user_role": requested_user_data['role']}, expiration_delta=access_token_expiration_delta)
 
         # Return success message and the access token
         return {
@@ -271,19 +271,22 @@ async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
             "access_token": access_token,
             "token_type": "bearer"
         }
-        
+
     except asyncpg.PostgresError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Logging In User: Database Error ({str(e)})"
         )
     
+    except HTTPException as e:
+        raise e
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Logging In User: {str(e)}"
         )
-    
+
 # --- Add a New Book to the Store ---
 @app.post("/books")
 async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_connection)):
@@ -299,7 +302,7 @@ async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_
             result = await db.execute(
                 "INSERT INTO books (title, author, description, price, cover_image_url, created_at) "
                 "VALUES ($1, $2, $3, $4, $5, $6) RETURNING book_id",
-                book_data.book_title, book_data.book_author, book_data.book_description, 
+                book_data.book_title, book_data.book_author, book_data.book_description,
                 book_data.book_price, book_data.book_cover_image_url, datetime.now(timezone.utc)
             )
 
@@ -316,13 +319,16 @@ async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error Adding Book: Violation Error"
         )
-    
+
     except asyncpg.PostgresError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Adding Book: Database Error ({str(e)})"
         )
     
+    except HTTPException as e:
+        raise e
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -343,7 +349,7 @@ async def get_all_books(db=Depends(lease_db_connection)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Getting Books: Database Error ({str(e)})"
         )
-    
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -371,6 +377,9 @@ async def get_book_by_id(book_id: int, db=Depends(lease_db_connection)):
             detail=f"Error Getting Book: Database Error ({str(e)})"
         )
     
+    except HTTPException as e:
+        raise e
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -391,7 +400,7 @@ async def update_cart(cart_items: Post_Cart, access_token: str, db=Depends(lease
             for item in cart_items.items:
                 await db.execute(
                     """
-                    INSERT INTO cart_items (user_id, book_id, quantity, added_at) 
+                    INSERT INTO cart_items (user_id, book_id, quantity, added_at)
                     VALUES ($1, $2, $3, $4)
                     ON CONFLICT (user_id, book_id)
                     DO UPDATE SET quantity = EXCLUDED.quantity
@@ -408,13 +417,13 @@ async def update_cart(cart_items: Post_Cart, access_token: str, db=Depends(lease
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Error Updating Cart: Violation Error"
         )
-    
+
     except asyncpg.PostgresError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Updating Cart: Database Error ({str(e)})"
         )
-    
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -433,21 +442,24 @@ async def get_cart(access_token: str, db=Depends(lease_db_connection)):
             "SELECT b.title, b.author, c.quantity, b.price FROM cart_items c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = $1",
             user_id
         )
-        
+
         if not items:
             raise HTTPException(
-                status_code=404, 
+                status_code=404,
                 detail="Cart is empty or not found"
             )
-        
+
         return {"cart_items": items}
-    
+
     except asyncpg.PostgresError as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Getting Cart: Database Error ({str(e)})"
         )
     
+    except HTTPException as e:
+        raise e
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
