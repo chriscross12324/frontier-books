@@ -3,7 +3,7 @@ import { IoAdd, IoRemove, IoTrashOutline } from "react-icons/io5";
 import { CartContext } from "../services/CartContext";
 import styles from '../css/cart-item.module.css'
 
-export default function CartItem({ cartItem }) {
+export default function CartItem({ cartItem, hasCartUpdatedRef }) {
     const { updateQuantity, removeItem } = useContext(CartContext);
 
     return (
@@ -21,10 +21,10 @@ export default function CartItem({ cartItem }) {
                 
                 <div className={styles.quantity_pricing}>
                     <div className={styles.quantity_controls}>
-                        <button className={styles.button_change_quantity} onClick={() => updateQuantity(cartItem.title, cartItem.quantity - 1)}><IoRemove className={styles.icon_change_quantity}/></button>
+                        <button className={styles.button_change_quantity} onClick={() => {updateQuantity(cartItem.title, cartItem.quantity - 1); hasCartUpdatedRef.current = true;}}><IoRemove className={styles.icon_change_quantity}/></button>
                         <input type="text" className={styles.item_quantity} value={cartItem.quantity} min="1" disabled></input>
-                        <button className={styles.button_change_quantity} onClick={() => updateQuantity(cartItem.title, cartItem.quantity + 1)}><IoAdd className={styles.icon_change_quantity}/></button>
-                        <button className={styles.remove_button} onClick={() => removeItem(cartItem.title)}><IoTrashOutline /></button>
+                        <button className={styles.button_change_quantity} onClick={() => {updateQuantity(cartItem.title, cartItem.quantity + 1); hasCartUpdatedRef.current = true;}}><IoAdd className={styles.icon_change_quantity}/></button>
+                        <button className={styles.remove_button} onClick={() => {removeItem(cartItem.title); hasCartUpdatedRef.current = true;}}><IoTrashOutline /></button>
                     </div>
                     <p className={styles.item_price}>${(cartItem.price * cartItem.quantity).toFixed(2)}</p>
                 </div>

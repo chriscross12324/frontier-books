@@ -9,6 +9,7 @@ const Header = () => {
     const { cart } = useContext(CartContext);
     const { user, logout } = useAuth();
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const hasCartUpdatedRef = useRef(false);
     const cartRef = useRef(null);
 
     const toggleCart = () => setIsCartOpen(!isCartOpen);
@@ -46,7 +47,7 @@ const Header = () => {
                         {isCartOpen && (
                             <div className={styles.cart_dropdown}>
                                 <div className={styles.cart_header}>
-                                    <h3 className={styles.cart_title}>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</h3>
+                                    <h3 className={styles.cart_title}>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)}){hasCartUpdatedRef.current ? "*" : ""}</h3>
                                     <button className={styles.button_close_cart} onClick={() => setIsCartOpen(false)}>
                                         <IoClose className={styles.icon_close_cart}/>
                                     </button>
@@ -55,7 +56,7 @@ const Header = () => {
                                     <ul className={styles.list_cart}>
                                         {cart.map((item, index) => (
                                             <li key={index}>
-                                                <CartItem cartItem={item} />
+                                                <CartItem cartItem={item} hasCartUpdatedRef={hasCartUpdatedRef} />
                                             </li>
                                         ))}
                                     </ul>
@@ -64,7 +65,7 @@ const Header = () => {
                                         <p className={styles.empty_cart_text}>Your cart is empty.</p>
                                     </div>
                                 )}
-                                {cart.length > 0 && <button className={styles.button_checkout}>Checkout (${(cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2)})</button>}
+                                {cart.length > 0 && <button className={styles.button_checkout} onClick={() => {location.href="/checkout"; hasCartUpdatedRef.current = false;}}>Checkout (${(cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2)})</button>}
                             </div>
                         )}
                     </div>
