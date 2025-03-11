@@ -12,7 +12,7 @@ export default function CartItem({ cartItem, hasCartUpdatedRef }) {
             <div className={styles.item_footer}>
                 <div>
                     <h2 className={styles.item_author}>
-                        Author
+                        {cartItem.author}
                     </h2>
                     <h2 className={styles.item_title}>
                         {cartItem.title}
