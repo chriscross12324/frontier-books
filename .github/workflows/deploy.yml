@@ -25,6 +25,13 @@ jobs:
       - name: Build Project
         run: npm run build
 
+      - name: Debug - List Files
+        run: |
+          echo "Root Directory:"
+          ls -la
+          echo "Dist Directory:"
+          ls -la dist
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
