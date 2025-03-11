@@ -2,7 +2,7 @@
   "name": "frontier-books",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://chriscross12324.github.io/frontier-books/",
+  "homepage": "https://chriscross12324.github.io/frontier-books",
   "type": "module",
   "scripts": {
     "dev": "vite",
