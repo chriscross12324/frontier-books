@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router'
+import { HashRouter, Routes, Route } from 'react-router'
 import './index.css'
 import './styles.css'
 import Checkout from './pages/Checkout.jsx'
@@ -17,7 +17,7 @@ createRoot(root).render(
   <NotificationProvider>
     <AuthProvider>
       <CartProvider>
-        <BrowserRouter>
+        <HashRouter>
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/checkout' element={<Checkout />} />
@@ -25,7 +25,7 @@ createRoot(root).render(
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </CartProvider>
     </AuthProvider>
   </NotificationProvider>
