@@ -113,8 +113,9 @@ export const CartProvider = ({ children }) => {
         const access_token = getValidAccessToken();
         if (!access_token) return null;
 
-        if (newQuantity === 0) {
+        if (newQuantity <= 0) {
             removeItem(id);
+            return;
         }
 
         setCart((prevCart) => prevCart.map(item =>
