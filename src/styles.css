@@ -8,7 +8,7 @@
 
 body {
     font-family: 'Roboto', sans-serif;
-    background: white;
+    background: #121212;
     color: #333;
     line-height: 1.6;
     padding-top: 0;
@@ -30,7 +30,3 @@ main {
     padding: 40px 20px;
     width: 100%;
 }
-
-
-
-

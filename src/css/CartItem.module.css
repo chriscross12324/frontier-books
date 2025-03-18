@@ -2,10 +2,10 @@
     display: flex;
     flex-direction: row;
     width: 100%;
-    border: 1.5px solid #e9e9e9;
+    border: 2px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 4px 8px 4px 4px;
-    background-color: white;
+    background-color: transparent;
     gap: 8px;
 }
 
@@ -32,7 +32,7 @@
 .item_author {
     font-size: 12px;
     font-weight: normal;
-    color: #777;
+    color: rgba(255, 255, 255, 0.4);
     flex: 1;
 }
 
@@ -40,7 +40,7 @@
     font-size: 14px;
     font-weight: bold;
     line-height: 1.1;
-    color: black;
+    color: rgba(255, 255, 255, 0.85);
     flex: 1;
 }
 
@@ -49,6 +49,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    color: rgba(255, 255, 255, 0.75);
 }
 
 .quantity_controls {
@@ -63,15 +64,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.01);
+    background-color: rgba(255, 255, 255, 0.05);
     cursor: pointer;
-    color: black;
+    color: rgb(255, 255, 255);
 }
 
 .button_change_quantity:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .icon_change_quantity {
@@ -81,10 +82,12 @@
 .item_quantity {
     height: 30px;
     width: 60px;
-    border: 1px solid #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.01);
+    background-color: rgba(255, 255, 255, 0.05);
     text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: bold;
 }
 
 .item_price {
@@ -95,6 +98,7 @@
 .remove_button {
     height: 30px;
     width: 30px;
+    font-size: 16px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -106,6 +110,6 @@
 }
 
 .remove_button:hover {
-    background-color: rgba(255, 0, 0, 0.1);
-    color: red;
+    background-color: rgba(255, 0, 0, 0.5);
+    color: rgb(255, 255, 255);
 }
