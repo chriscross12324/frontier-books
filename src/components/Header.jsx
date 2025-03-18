@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useContext } from "react";
 import CartItem from "./CartItem";
 import { CartContext } from "../services/CartContext";
 import { useAuth } from "../services/AuthContext"
+import { Link } from "react-router";
 
 const Header = () => {
     const { cart } = useContext(CartContext);
@@ -31,8 +32,8 @@ const Header = () => {
             <div className={styles.header_left}>
                 <div className={styles.logo}>Frontier Books</div>
                 <nav>
-                    <a href="/">Home</a>
-                    <a href="/contact">Contact Us</a>
+                    <Link to="/">Home</Link>
+                    <Link to="/contact">Contact Us</Link>
                 </nav>
             </div>
 
@@ -41,7 +42,7 @@ const Header = () => {
                     <div className={styles.cart_container}>
                         <button className={styles.cart_button} onClick={toggleCart}>
                             <IoCartOutline className={styles.icon} />
-                            <a className={styles.cart_text} href="#">Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</a>
+                            <Link className={styles.cart_text}>Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</Link>
                         </button>
                         
                         {isCartOpen && (
@@ -70,10 +71,10 @@ const Header = () => {
                         )}
                     </div>
                     
-                    <a href="" className={styles.sign_in} onClick={logout}>Account</a>
+                    <Link to="/" className={styles.sign_in} onClick={logout}>Account</Link>
                 </div>
             ) : (
-                <a href="/login" className={styles.sign_in}>Sign In</a>
+                <Link to="/login">Sign In</Link>
             )}
             
             
