@@ -6,7 +6,9 @@ const BookDialog = ({ book, onClose }) => {
     if (!book) return null;
 
     return (
-        <div className={styles.overlay}>
+        <div className={styles.overlay} onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+        }}>
             <div className={styles.dialog}>
                 <button className={styles.button_close} onClick={onClose}>
                     <IoClose className={styles.icon_close} />
