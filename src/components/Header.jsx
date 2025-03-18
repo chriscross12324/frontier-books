@@ -1,5 +1,5 @@
 import { IoClose, IoCartOutline } from "react-icons/io5";
-import styles from '../css/header.module.css'
+import styles from '../css/Header.module.css'
 import { useEffect, useState, useRef, useContext } from "react";
 import CartItem from "./CartItem";
 import { CartContext } from "../services/CartContext";

@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { IoAdd, IoRemove, IoTrashOutline } from "react-icons/io5";
 import { CartContext } from "../services/CartContext";
-import styles from '../css/cart-item.module.css'
+import styles from '../css/CartItem.module.css'
 
 export default function CartItem({ cartItem, hasCartUpdatedRef }) {
     const { updateQuantity, removeItem } = useContext(CartContext);

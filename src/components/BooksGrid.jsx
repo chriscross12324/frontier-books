@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import styles from '../css/home.module.css'
+import styles from '../css/PageHome.module.css'
 import { CartContext } from "../services/CartContext"
 import { useNotification } from "../components/Notification"
 
