@@ -1,8 +1,10 @@
 import { createContext, useState, useEffect } from "react";
+import { useNotification } from "../components/Notification";
 
 export const CartContext = createContext();
 
 export const CartProvider = ({ children }) => {
+    const { showNotification } = useNotification();
     const [cart, setCart] = useState([]);
 
     useEffect(() => {
@@ -26,6 +28,8 @@ export const CartProvider = ({ children }) => {
             }
             return updatedCart;
         });
+
+        showNotification("Added to cart!");
     };
 
     const updateQuantity = (id, newQuantity) => {

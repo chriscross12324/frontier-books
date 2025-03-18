@@ -6,7 +6,6 @@ import { useNotification } from "../components/Notification"
 const BooksGrid = () => {
     const [books, setBooks] = useState([]);
     const { cart, addToCart } = useContext(CartContext);
-    const { showNotification } = useNotification();
 
     useEffect(() => {
         fetch("https://findthefrontier.ca/frontier_books/books")
@@ -26,7 +25,7 @@ const BooksGrid = () => {
                     <p className={styles.book_title}>{book.title}</p>
                     <p className={styles.book_author}>by: {book.author}</p>
                     <div>
-                        <button className={styles.button_add} onClick={() => {addToCart(book); showNotification("Added to cart!")}}>Add to Cart</button>
+                        <button className={styles.button_add} onClick={() => {addToCart(book);}}>Add to Cart</button>
                         <div className={styles.book_price_container}>
                             <p className={styles.book_price_text}>${book.price.toFixed(2)}</p>
                         </div>
