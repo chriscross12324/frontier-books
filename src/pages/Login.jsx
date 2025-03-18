@@ -2,6 +2,8 @@ import styles from '../css/PageLogin.module.css'
 import { useState } from "react";
 import { useAuth } from "../services/AuthContext"
 import { useNotification } from "../components/Notification"
+import { IoClose } from "react-icons/io5";
+import { Link } from 'react-router';
 
 export default function Login() {
     const { showNotification } = useNotification();
@@ -12,6 +14,8 @@ export default function Login() {
 
     async function handleLogin(e) {
         e.preventDefault();
+
+        showNotification("Logging In")
 
         fetch("https://findthefrontier.ca/frontier_books/login", {
             method: "POST",
@@ -41,14 +45,18 @@ export default function Login() {
     return (
         <div className={styles.login_page_background}>
             <div className={styles.login_container}>
+                <button className={styles.button_close} onClick={() => location.href = '/'}>
+                    <IoClose className={styles.icon_close} />
+                </button>
                 <h1 className={styles.login_title}>Sign-In</h1>
                 <h2 className={styles.login_description}>Continue browsing the best book selection available.</h2>
                 <form onSubmit={handleLogin}>
                     <input className={styles.credential_input} type="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)}></input>
                     <input className={styles.credential_input} type="password" placeholder='Password' onChange={(e) => setPassword(e.target.value)}></input>
-                    <h3 className={styles.forgot_password}>Forgot password?</h3>
                     <button className={styles.button}>Continue</button>
                 </form>
+
+                <Link to="/register" className={styles.button_create_account}>Create Account</Link>
                 {error && <p className={styles.error}>{error}</p>}
             </div>
         </div>
