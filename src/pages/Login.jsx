@@ -1,4 +1,4 @@
-import '../css/page-login.css'
+import styles from '../css/page-login.module.css'
 import { useState } from "react";
 import { useAuth } from "../services/AuthContext"
 import { useNotification } from "../components/Notification"
@@ -39,16 +39,19 @@ export default function Login() {
     }
 
     return (
-        <div className="login-container">
-            <h1>Sign in with email</h1>
-            <h2>Continue browsing the best books available.</h2>
-            <form onSubmit={handleLogin}>
-                <input type="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)}></input>
-                <input type="password" placeholder='Password' onChange={(e) => setPassword(e.target.value)}></input>
-                <h3>Forgot password?</h3>
-                <button>Continue</button>
-            </form>
-            {error && <p>{error}</p>}
+        <div className={styles.login_page_background}>
+            <div className={styles.login_container}>
+                <h1 className={styles.login_title}>Sign-In</h1>
+                <h2 className={styles.login_description}>Continue browsing the best book selection available.</h2>
+                <form onSubmit={handleLogin}>
+                    <input className={styles.credential_input} type="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)}></input>
+                    <input className={styles.credential_input} type="password" placeholder='Password' onChange={(e) => setPassword(e.target.value)}></input>
+                    <h3 className={styles.forgot_password}>Forgot password?</h3>
+                    <button className={styles.button}>Continue</button>
+                </form>
+                {error && <p className={styles.error}>{error}</p>}
+            </div>
         </div>
+        
     );
 }
