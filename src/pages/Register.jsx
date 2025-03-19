@@ -58,7 +58,7 @@ export default function Register() {
                     <button className={styles.button}>Continue</button>
                 </form>
 
-                <Link to="/register" className={styles.button_create_account}>Create Account</Link>
+                <Link to="/login" className={styles.button_create_account}>Sign In</Link>
                 {error && <p className={styles.error}>{error}</p>}
             </div>
         </div>
