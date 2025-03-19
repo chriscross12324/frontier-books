@@ -2,7 +2,7 @@ import asyncio
 import asyncpg
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
-from fastapi import FastAPI, HTTPException, Depends, Request, status
+from fastapi import FastAPI, HTTPException, Depends, Request, status, Form, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
@@ -85,6 +85,9 @@ class General_User(BaseModel):
 class General_CartItem(BaseModel):
     book_id: int
     book_quantity: int
+
+class General_IntList(BaseModel):
+    int_list: List[int]
 
 # --- GET ---
 class Get_Book(BaseModel):
@@ -211,7 +214,8 @@ async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
 
         # Return success message and the access token
         return {
-            "message": "User created successfully",
+            "status_code": status.HTTP_200_OK,
+            "detail": "User created successfully",
             "access_token": access_token,
             "token_type": "bearer"
         }
@@ -267,7 +271,8 @@ async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
 
         # Return success message and the access token
         return {
-            "message": "Login successful",
+            "status_code": status.HTTP_200_OK,
+            "detail": "Login successful",
             "access_token": access_token,
             "token_type": "bearer"
         }
@@ -277,7 +282,7 @@ async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Logging In User: Database Error ({str(e)})"
         )
-    
+
     except HTTPException as e:
         raise e
 
@@ -311,7 +316,8 @@ async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_
 
         # Return success message and book id
         return {
-            "message": f"Book added successfully {str(book_id)}"
+            "status_code": status.HTTP_200_OK,
+            "detail": f"Book added successfully {str(book_id)}"
         }
 
     except asyncpg.UniqueViolationError:
@@ -325,7 +331,7 @@ async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Adding Book: Database Error ({str(e)})"
         )
-    
+
     except HTTPException as e:
         raise e
 
@@ -341,6 +347,7 @@ async def get_all_books(db=Depends(lease_db_connection)):
     try:
         all_books = await db.fetch("SELECT * from books ORDER BY RANDOM()")
         return {
+            "status_code": status.HTTP_200_OK,
             "books": all_books
         }
 
@@ -368,6 +375,7 @@ async def get_book_by_id(book_id: int, db=Depends(lease_db_connection)):
             )
 
         return {
+            "status_code": status.HTTP_200_OK,
             "book": book
         }
 
@@ -376,7 +384,7 @@ async def get_book_by_id(book_id: int, db=Depends(lease_db_connection)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Getting Book: Database Error ({str(e)})"
         )
-    
+
     except HTTPException as e:
         raise e
 
@@ -409,7 +417,8 @@ async def update_cart(cart_items: Post_Cart, access_token: str, db=Depends(lease
                 )
 
         return {
-            "message": "Cart updated successfully"
+            "status_code": status.HTTP_200_OK,
+            "detail": "Cart updated successfully"
         }
 
     except asyncpg.UniqueViolationError:
@@ -445,8 +454,8 @@ async def get_cart(access_token: str, db=Depends(lease_db_connection)):
 
         if not items:
             raise HTTPException(
-                status_code=404,
-                detail="Cart is empty or not found"
+                status_code=status.HTTP_204_NO_CONTENT,
+                detail="Error Getting Cart: Empty or Doesn't Exist"
             )
 
         return {"cart_items": items}
@@ -456,7 +465,7 @@ async def get_cart(access_token: str, db=Depends(lease_db_connection)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Getting Cart: Database Error ({str(e)})"
         )
-    
+
     except HTTPException as e:
         raise e
 
