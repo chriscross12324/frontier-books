@@ -8,7 +8,7 @@ import { Link } from "react-router";
 
 const Header = () => {
     const { cart, isCartSaved, syncCart, loadRemoteCart, saveLocalCart } = useContext(CartContext);
-    const { user, logout } = useAuth();
+    const { isAuthenticated, logout } = useAuth();
     const [isCartOpen, setIsCartOpen] = useState(false);
     const hasCartUpdatedRef = useRef(false);
     const cartRef = useRef(null);
@@ -25,7 +25,7 @@ const Header = () => {
                 </nav>
             </div>
 
-            {user ? (
+            {isAuthenticated ? (
                 <div className={styles.header_right}>
                     <div className={styles.cart_container}>
                         <button className={styles.cart_button} onClick={toggleCart}>
