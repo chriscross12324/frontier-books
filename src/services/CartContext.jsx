@@ -7,6 +7,7 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
     const { showNotification } = useNotification();
     const { getValidAccessToken } = useAuth();
+    const [cartSaved, setCartSaved] = useState(true);
     const [cart, setCart] = useState([]);
 
     // --- Fetch User Cart from API ---
@@ -29,13 +30,77 @@ export const CartProvider = ({ children }) => {
             const data = await response.json();
 
             console.debug("Remote Cart: ", data.cart_items);
-            //return await response.json();
-            return null;
+            return await data.cart_items;
         } catch (err) {
             console.error("Error fetching cart: ", err);
             return null;
         }
     }
+
+    // --- Load Book Details from ID List ---
+    const loadBookDetails = async (id_list) => {
+        if (id_list.length <= 0) return null;
+    
+        try {
+            const response = await fetch("https://findthefrontier.ca/frontier_books/books/details", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({int_list: id_list})
+            });
+
+            const book_details = await response.json();
+
+            return book_details.books;
+
+        } catch (err) {
+            console.error("Error Fetching Book Details: ", err);
+        }
+    }
+
+    // --- Load Local Cart from Remote ---
+    const loadRemoteCart = async () => {
+        try {
+            // Check User is Logged In
+            const access_token = getValidAccessToken();
+            if (!access_token) return null;
+
+            // Retrieve User's Cart from API
+            const response = await fetch("https://findthefrontier.ca/frontier_books/cart", {
+                headers: { Authorization: `Bearer ${access_token}` }
+            });
+
+            // Check if Request was Successful
+            if (response.status == 500) throw new Error("Fetch Unsuccessful");
+
+            // Check if User's Cart Exists
+            if (response.status != 200) throw new Error("Remote Cart is Empty: ", response.status);
+            
+            // Extract Cart Data
+            const data = await response.json();
+
+            const book_id_list = data.cart_items.map(book => book.book_id);
+
+            const book_details = await loadBookDetails(book_id_list);
+
+            const updated_book_details = book_details.map(book => ({
+                ...book,
+                quantity: data.cart_items.find(item => item.book_id === book.book_id)?.quantity || 0
+            }));
+
+            console.debug("Local Cart Datils: ", JSON.parse(localStorage.getItem("cart")) || { items: [], last_updated: 0 })
+            console.debug("Loaded Book Details: ", updated_book_details);
+            console.debug("Remote Cart Details: ", data.cart_items);
+
+            setCart(updated_book_details);
+        } catch (err) {
+            console.error("Error fetching cart: ", err);
+            return null;
+        }
+    }
+
+    // --- Push Local Cart to Remote ---
 
     // --- Sync the Local and Remote Cart ---
     const syncCart = async () => {
@@ -46,7 +111,10 @@ export const CartProvider = ({ children }) => {
         const remoteCart = await fetchRemoteCart();
 
         console.debug("Local Cart: ", localCart);
+        console.debug("Last Updated Remote Cart: ", remoteCart.last_updated);
+        console.debug("Last Updated Local Cart: ", localCart.last_updated);
         if (!remoteCart) return;
+        return;
 
         if (remoteCart === 204 || localCart.last_updated > remoteCart.last_updated) {
             // Local Cart is Newer, Replace Remote Copy
@@ -133,7 +201,7 @@ export const CartProvider = ({ children }) => {
     };
 
     return (
-        <CartContext.Provider value={{ cart, syncCart, addToCart, updateQuantity, removeItem }}>
+        <CartContext.Provider value={{ cart, cartSaved, syncCart, loadRemoteCart, addToCart, updateQuantity, removeItem, setCartSaved }}>
             {children}
         </CartContext.Provider>
     );
