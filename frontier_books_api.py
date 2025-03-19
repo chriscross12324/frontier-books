@@ -462,7 +462,7 @@ async def get_cart(authorization: str = Header(None), db=Depends(lease_db_connec
         user_id = user['user_id']
 
         items = await db.fetch(
-            "SELECT b.title, b.author, c.quantity, b.price FROM cart_items c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = $1",
+            "SELECT b.book_id, c.quantity FROM cart_items c JOIN books b ON c.book_id = b.book_id WHERE c.user_id = $1",
             user_id
         )
 
