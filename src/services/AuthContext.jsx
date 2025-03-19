@@ -1,9 +1,13 @@
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router";
+import { useDialog } from "./DialogContext";
+import { useNotification } from "../components/Notification";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+    const { openDialogConfirm } = useDialog();
+    const { showNotification } = useNotification();
     const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem("frontierBooks_access_token")));
     const navigate = useNavigate();
 
@@ -15,8 +19,15 @@ export function AuthProvider({ children }) {
 
     // --- Remove the Access Token from localStorage and Update the Authentication State ---
     const logout = () => {
-        localStorage.removeItem("frontierBooks_access_token");
-        setIsAuthenticated(false);
+        openDialogConfirm({
+            dialogTitle: "Sign Out?",
+            dialogMessage: "Signing out will end your session. Do you want to proceed?",
+            onConfirm: () => {
+                localStorage.removeItem("frontierBooks_access_token");
+                setIsAuthenticated(false);
+                showNotification("Signed Out");
+            }
+        });
     };
 
     // --- Redirect the User to the Login Page ---
@@ -38,9 +49,14 @@ export function AuthProvider({ children }) {
 
         // Ensure the Access Token Exists
         if (!accessToken) {
-            if (confirm("This action requires you to log in.")) {
-                redirectToLogin();
-            }
+            openDialogConfirm({
+                dialogTitle: "Sign In Required",
+                dialogMessage: "This action requires an account. Please log in or sign up to continue.",
+                dialogPrimaryButtonText: "Sign In",
+                onConfirm: () => {
+                    redirectToLogin();
+                }
+            });
             setIsAuthenticated(false);
             return null;
         }
@@ -50,9 +66,14 @@ export function AuthProvider({ children }) {
         if (!tokenData) {
             console.error("Invalid Token");
             localStorage.removeItem("frontierBooks_access_token");
-            if (confirm("This action requires you to log in.")) {
-                redirectToLogin();
-            }
+            openDialogConfirm({
+                dialogTitle: "Sign In Required",
+                dialogMessage: "This action requires an account. Please log in or sign up to continue.",
+                dialogPrimaryButtonText: "Sign In",
+                onConfirm: () => {
+                    redirectToLogin();
+                }
+            });
             setIsAuthenticated(false);
             return null;
         }
@@ -60,9 +81,14 @@ export function AuthProvider({ children }) {
         // Ensure Access Token is Still Valid
         if (Date.now() >= tokenData.exp * 1000) {
             localStorage.removeItem("frontierBooks_access_token");
-            if (confirm("Your session has expired. Please log in again")) {
-                redirectToLogin();
-            }
+            openDialogConfirm({
+                dialogTitle: "Session Expired",
+                dialogMessage: "For security reasons, your session has expired. Please sign in again to continue.",
+                dialogPrimaryButtonText: "Sign In",
+                onConfirm: () => {
+                    redirectToLogin();
+                }
+            });
             setIsAuthenticated(false);
             return null;
         }
