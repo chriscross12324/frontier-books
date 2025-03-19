@@ -7,7 +7,7 @@ import { useAuth } from "../services/AuthContext"
 import { Link } from "react-router";
 
 const Header = () => {
-    const { cart, syncCart } = useContext(CartContext);
+    const { cart, isCartSaved, syncCart, loadRemoteCart, saveLocalCart } = useContext(CartContext);
     const { user, logout } = useAuth();
     const [isCartOpen, setIsCartOpen] = useState(false);
     const hasCartUpdatedRef = useRef(false);
@@ -30,14 +30,14 @@ const Header = () => {
                     <div className={styles.cart_container}>
                         <button className={styles.cart_button} onClick={toggleCart}>
                             <IoCartOutline className={styles.icon} />
-                            <Link className={styles.cart_text}>Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)})</Link>
+                            <Link className={styles.cart_text}>Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)}){isCartSaved.current ? "" : "*"}</Link>
                         </button>
                         
                         {isCartOpen && (
                             <div className={styles.cart_dropdown}>
                                 <div className={styles.cart_header}>
-                                    <h3 className={styles.cart_title}>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)}){hasCartUpdatedRef.current ? "*" : ""}</h3>
-                                    <button className={styles.button_close_cart} onClick={() => {toggleCart(); syncCart();}}>
+                                    <h3 className={styles.cart_title}>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)}){isCartSaved.current ? "" : "*"}</h3>
+                                    <button className={styles.button_close_cart} onClick={() => {toggleCart(); loadRemoteCart();}}>
                                         <IoClose className={styles.icon_close_cart}/>
                                     </button>
                                 </div>
@@ -45,7 +45,7 @@ const Header = () => {
                                     <ul className={styles.list_cart}>
                                         {cart.map((item, index) => (
                                             <li key={index}>
-                                                <CartItem cartItem={item} hasCartUpdatedRef={hasCartUpdatedRef} />
+                                                <CartItem cartItem={item} />
                                             </li>
                                         ))}
                                     </ul>
@@ -54,7 +54,7 @@ const Header = () => {
                                         <p className={styles.empty_cart_text}>Your cart is empty.</p>
                                     </div>
                                 )}
-                                {cart.length > 0 && <button className={styles.button_checkout} onClick={() => {location.href="/checkout"; hasCartUpdatedRef.current = false;}}>Checkout (${(cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2)})</button>}
+                                {cart.length > 0 && <button className={styles.button_checkout} onClick={() => {location.href="/checkout"}}>Checkout (${(cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2)})</button>}
                             </div>
                         )}
                     </div>
@@ -67,7 +67,7 @@ const Header = () => {
             
             
 
-            {isCartOpen && <div className={styles.overlay} onClick={() => {toggleCart(); syncCart();}}></div>}
+            {isCartOpen && <div className={styles.overlay} onClick={() => {toggleCart(); saveLocalCart();}}></div>}
         </header>
     );
 };
