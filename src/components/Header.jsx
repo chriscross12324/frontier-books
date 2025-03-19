@@ -7,11 +7,9 @@ import { useAuth } from "../services/AuthContext"
 import { Link } from "react-router";
 
 const Header = () => {
-    const { cart, isCartSaved, syncCart, loadRemoteCart, saveLocalCart } = useContext(CartContext);
+    const { cart, isCartSaved, saveLocalCart } = useContext(CartContext);
     const { isAuthenticated, logout } = useAuth();
     const [isCartOpen, setIsCartOpen] = useState(false);
-    const hasCartUpdatedRef = useRef(false);
-    const cartRef = useRef(null);
 
     const toggleCart = () => setIsCartOpen(!isCartOpen);
 
@@ -37,7 +35,7 @@ const Header = () => {
                             <div className={styles.cart_dropdown}>
                                 <div className={styles.cart_header}>
                                     <h3 className={styles.cart_title}>My Cart ({cart.reduce((sum, item) => sum + item.quantity, 0)}){isCartSaved.current ? "" : "*"}</h3>
-                                    <button className={styles.button_close_cart} onClick={() => {toggleCart(); loadRemoteCart();}}>
+                                    <button className={styles.button_close_cart} onClick={() => {toggleCart(); saveLocalCart();}}>
                                         <IoClose className={styles.icon_close_cart}/>
                                     </button>
                                 </div>
