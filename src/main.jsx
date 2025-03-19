@@ -15,9 +15,9 @@ const root = document.getElementById('root');
 
 createRoot(root).render(
   <NotificationProvider>
-    <AuthProvider>
-      <CartProvider>
-        <HashRouter>
+    <HashRouter>
+      <AuthProvider>
+        <CartProvider>
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/checkout' element={<Checkout />} />
@@ -25,8 +25,8 @@ createRoot(root).render(
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
           </Routes>
-        </HashRouter>
-      </CartProvider>
-    </AuthProvider>
+        </CartProvider>
+      </AuthProvider>
+    </HashRouter>
   </NotificationProvider>
 )
