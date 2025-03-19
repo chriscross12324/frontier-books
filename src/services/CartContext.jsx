@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useContext } from "react";
+import { createContext, useState, useEffect, useContext, useRef } from "react";
 import { useAuth } from "./AuthContext";
 import { useNotification } from "../components/Notification";
 
@@ -7,7 +7,7 @@ export const CartContext = createContext();
 export const CartProvider = ({ children }) => {
     const { showNotification } = useNotification();
     const { getValidAccessToken } = useAuth();
-    const [cartSaved, setCartSaved] = useState(true);
+    const isCartSaved = useRef(true);
     const [cart, setCart] = useState([]);
 
     // --- Fetch User Cart from API ---
@@ -63,12 +63,12 @@ export const CartProvider = ({ children }) => {
     const loadRemoteCart = async () => {
         try {
             // Check User is Logged In
-            const access_token = getValidAccessToken();
-            if (!access_token) return null;
+            const accessToken = getValidAccessToken();
+            if (!accessToken) return null;
 
             // Retrieve User's Cart from API
             const response = await fetch("https://findthefrontier.ca/frontier_books/cart", {
-                headers: { Authorization: `Bearer ${access_token}` }
+                headers: { Authorization: `Bearer ${accessToken}` }
             });
 
             // Check if Request was Successful
@@ -101,6 +101,47 @@ export const CartProvider = ({ children }) => {
     }
 
     // --- Push Local Cart to Remote ---
+    const saveLocalCart = async () => {
+        console.debug("Saving Cart");
+
+        // Check User is Logged In
+        const accessToken = getValidAccessToken();
+        if (!accessToken) return null;
+
+        console.debug("User Authenticated");
+
+        try {
+            // Get Local Cart
+            const localCart = JSON.parse(localStorage.getItem("cart")) || { items: [] };
+            console.debug("Cart: ", localCart);
+
+            // Ensure Cart Contains Items
+            if (localCart.length <= 0) return null;
+            console.debug("Cart Contains Items: ", localCart.length);
+
+            // Push Local Cart to Remote
+            const response = await fetch("https://findthefrontier.ca/frontier_books/cart", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`
+                },
+                body: JSON.stringify({ cart_items: localCart.map(book => ({
+                    book_id: book.book_id,
+                    book_quantity: book.quantity
+                })) })
+            });
+
+            // Throw Error if Request Failed
+            if (response.status != 200) throw new Error(response.statusText);
+
+            isCartSaved.current = true;
+            return;
+        } catch (err) {
+            console.error("Error saving cart: ", err);
+            return null;
+        }
+    }
 
     // --- Sync the Local and Remote Cart ---
     const syncCart = async () => {
@@ -201,7 +242,7 @@ export const CartProvider = ({ children }) => {
     };
 
     return (
-        <CartContext.Provider value={{ cart, cartSaved, syncCart, loadRemoteCart, addToCart, updateQuantity, removeItem, setCartSaved }}>
+        <CartContext.Provider value={{ cart, isCartSaved, syncCart, loadRemoteCart, saveLocalCart, addToCart, updateQuantity, removeItem }}>
             {children}
         </CartContext.Provider>
     );
