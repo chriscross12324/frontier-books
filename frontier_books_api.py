@@ -394,6 +394,40 @@ async def get_book_by_id(book_id: int, db=Depends(lease_db_connection)):
             detail=f"Error Getting Book: {str(e)}"
         )
 
+# --- Retrieve Book Data from ID List ---
+@app.post("/books/details")
+async def get_books_by_ids(book_ids: General_IntList, db=Depends(lease_db_connection)):
+    if not book_ids.int_list:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No book IDs provided")
+    
+    try:
+        books = await db.fetch("SELECT * FROM books WHERE book_id = ANY($1)", book_ids.int_list)
+        if len(books) <= 0:
+            raise HTTPException(
+                status_code=status.HTTP_204_NO_CONTENT,
+                detail="Error Retrieving Books: No Books Found"
+            )
+        
+        return {
+            "status_code": status.HTTP_200_OK,
+            "books": books
+        }
+
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Book: Database Error ({str(e)})"
+        )
+
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Book: {str(e)}"
+        )
+
 # --- Update Cart ---
 @app.post("/cart")
 async def update_cart(cart_items: Post_Cart, authorization: str = Header(None), db=Depends(lease_db_connection)):
