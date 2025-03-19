@@ -396,8 +396,15 @@ async def get_book_by_id(book_id: int, db=Depends(lease_db_connection)):
 
 # --- Update Cart ---
 @app.post("/cart")
-async def update_cart(cart_items: Post_Cart, access_token: str, db=Depends(lease_db_connection)):
+async def update_cart(cart_items: Post_Cart, authorization: str = Header(None), db=Depends(lease_db_connection)):
     try:
+        # Check if Authorization Header is present and correctly formated
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=404, detail="Invalid or missing access token")
+        
+        #Extract access token
+        access_token = authorization.split("Bearer ")[1]
+
         # Get requesting user's id
         user = decode_access_token(access_token)
         user_id = user['user_id']
@@ -405,7 +412,7 @@ async def update_cart(cart_items: Post_Cart, access_token: str, db=Depends(lease
         async with db.transaction():
             await db.execute("DELETE FROM cart_items WHERE user_id = $1", user_id)
 
-            for item in cart_items.items:
+            for item in cart_items.cart_items:
                 await db.execute(
                     """
                     INSERT INTO cart_items (user_id, book_id, quantity, added_at)
@@ -441,8 +448,15 @@ async def update_cart(cart_items: Post_Cart, access_token: str, db=Depends(lease
 
 # --- Get Cart by User ID ---
 @app.get("/cart")
-async def get_cart(access_token: str, db=Depends(lease_db_connection)):
+async def get_cart(authorization: str = Header(None), db=Depends(lease_db_connection)):
     try:
+        # Check if Authorization Header is present and correctly formated
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=404, detail="Invalid or missing access token")
+        
+        #Extract access token
+        access_token = authorization.split("Bearer ")[1]
+
         # Get requesting user's id
         user = decode_access_token(access_token)
         user_id = user['user_id']
