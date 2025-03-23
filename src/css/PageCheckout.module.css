@@ -1,0 +1,77 @@
+.pageRootLayout {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rowLayout {
+    height: calc(100% - 200px);
+    width: calc(100% - 200px);
+    max-width: 1200px;
+    margin: 80px;
+    display: flex;
+    flex-direction: row;
+}
+
+.itemsLayout {
+    height: 100%;
+    width: 50%;
+    background-color: rgb(41, 41, 41);
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    padding: 20px;
+}
+
+.navigationHeader {
+    height: 35px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.buttonClose {
+    height: 35px;
+    width: 35px;
+    display: flex;
+    align-items: center;
+    top: 10px;
+    right: 10px;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 20px;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+}
+
+.iconClose {
+    font-size: 22px;
+    width: 100%;
+}
+
+.navigationText {
+    color: rgb(255, 255, 255);
+    padding-left: 10px;
+    font-size: 18px;
+}
+
+.itemList {
+    max-height: 100%;
+}
+
+.listCart {
+    max-height: calc(100% - 45px);
+    overflow-y: auto;
+    list-style: none;
+}
+
+.paymentLayout {
+    height: 100%;
+    width: 50%;
+    background-color: rgb(53, 53, 53);
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    padding: 20px;
+}

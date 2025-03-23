@@ -1,6 +1,7 @@
 import { IoClose, IoCartOutline } from "react-icons/io5";
 import styles from '../css/Header.module.css'
 import { useEffect, useState, useRef, useContext } from "react";
+import { useNavigate } from "react-router";
 import CartItem from "./CartItem";
 import { CartContext } from "../services/CartContext";
 import { useAuth } from "../services/AuthContext"
@@ -12,6 +13,8 @@ const Header = () => {
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     const toggleCart = () => setIsCartOpen(!isCartOpen);
+
+    const navigate = useNavigate();
 
     return (
         <header className={styles.header}>
@@ -52,7 +55,7 @@ const Header = () => {
                                         <p className={styles.empty_cart_text}>Your cart is empty.</p>
                                     </div>
                                 )}
-                                {cart.length > 0 && <button className={styles.button_checkout} onClick={() => {location.href="/checkout"}}>Checkout (${(cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2)})</button>}
+                                {cart.length > 0 && <button className={styles.button_checkout} onClick={() => {navigate("/checkout")}}>Checkout (${(cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2)})</button>}
                             </div>
                         )}
                     </div>

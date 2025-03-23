@@ -1,0 +1,61 @@
+.itemCard {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.02);
+    border-radius: 14px;
+    padding: 4px 8px 4px 4px;
+    background-color: rgba(255, 255, 255, 0.05);
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.item_info {
+    display: flex;
+    gap: 18px;
+}
+
+.itemImage {
+    width: 95px;
+    max-width: 95px;
+    max-height: 115px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.itemFooter {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-between;
+    gap: 4px;
+}
+
+.itemTitle {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.1;
+    color: rgba(255, 255, 255, 0.85);
+    flex: 1;
+}
+
+.itemAuthor {
+    font-size: 14px;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.4);
+    flex: 1;
+}
+
+.quantityPricing {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.itemPrice {
+    font-size: 18px;
+    font-weight: bold;
+}
