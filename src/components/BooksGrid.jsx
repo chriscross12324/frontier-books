@@ -3,10 +3,9 @@ import styles from '../css/PageHome.module.css'
 import { CartContext } from "../services/CartContext"
 import BookDialog from "./BookDialog";
 
-const BooksGrid = () => {
-    const [books, setBooks] = useState([]);
+const BooksGrid = ({ books }) => {
     const [selectedBook, setSelectedBook] = useState(null);
-    const { cart, addToCart } = useContext(CartContext);
+    const { addToCart } = useContext(CartContext);
 
     useEffect(() => {
         fetch("https://findthefrontier.ca/frontier_books/books")

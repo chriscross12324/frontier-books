@@ -7,14 +7,40 @@ import { CartContext } from "../services/CartContext";
 import { useAuth } from "../services/AuthContext"
 import { Link } from "react-router";
 
-const Header = () => {
+const Header = ({ books, setFilteredBooks }) => {
     const { cart, isCartSaved, saveLocalCart } = useContext(CartContext);
     const { isAuthenticated, isUserAdmin, logout } = useAuth();
+
+    const [searchTerm, setSearchTerm] = useState("");
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     const toggleCart = () => setIsCartOpen(!isCartOpen);
 
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (searchTerm === "") {
+            setFilteredBooks(books);
+        } else {
+            const lowerCaseSearch = searchTerm.toLowerCase();
+            const priceExactMatch = lowerCaseSearch.match(/^\$(\d+\.?\d*)$/);
+            const priceRangeMatch = lowerCaseSearch.match(/^\$(\d+\.?\d*)-\$(\d+\.?\d*)$/);
+            const priceLessThanMatch = lowerCaseSearch.match(/^<\$(\d+\.?\d*)$/);
+            const priceGreaterThanMatch = lowerCaseSearch.match(/^>\$(\d+\.?\d*)$/);
+
+            const filteredBooks = books.filter(book =>
+                book.title.toLowerCase().includes(lowerCaseSearch) ||
+                book.author.toLowerCase().includes(lowerCaseSearch) ||
+                book.description.toLowerCase().includes(lowerCaseSearch) ||
+                (priceExactMatch && book.price === parseFloat(priceExactMatch[1])) ||
+                (priceRangeMatch && book.price >= parseFloat(priceRangeMatch[1]) && book.price <= parseFloat(priceRangeMatch[2])) ||
+                (priceLessThanMatch && book.price < parseFloat(priceLessThanMatch[1])) ||
+                (priceGreaterThanMatch && book.price > parseFloat(priceGreaterThanMatch[1]))
+            );
+
+            setFilteredBooks(filteredBooks);
+        }
+    }, [searchTerm, books]);
 
     return (
         <header className={styles.header}>
@@ -26,7 +52,7 @@ const Header = () => {
                 </nav>
             </div>
 
-            <input className={styles.searchInput} type="text" placeholder="Search..."/>
+            <input className={styles.searchInput} type="text" placeholder="Search..." onChange={(e) => setSearchTerm(e.target.value)}/>
 
             {isAuthenticated ? (
                 <div className={styles.header_right}>
