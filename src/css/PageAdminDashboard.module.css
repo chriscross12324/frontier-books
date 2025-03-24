@@ -88,7 +88,7 @@
     list-style: none;
 }
 
-.paymentLayout {
+.tableLayout {
     height: 100%;
     width: calc(100% - min(50%, 200px));
     background-color: rgb(53, 53, 53);
@@ -97,7 +97,7 @@
     padding: 20px;
 }
 
-.paymentHeader {
+.tableHeader {
     height: 35px;
     display: flex;
     flex-direction: row;
@@ -129,7 +129,7 @@
     width: 100%;
     min-width: max-content;
     border-collapse: collapse;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(255, 255, 255, 0.1);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 

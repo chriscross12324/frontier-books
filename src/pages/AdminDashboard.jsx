@@ -89,8 +89,8 @@ export default function AdminDashboard() {
                         ))}
                     </ul>
                 </div>
-                <div className={styles.paymentLayout}>
-                    <div className={styles.paymentHeader}>
+                <div className={styles.tableLayout}>
+                    <div className={styles.tableHeader}>
                         <h1 className={styles.sectionTitle}>{selectedTable}</h1>
                         <div className={styles.tableHeaderActions}>
                             <button className={styles.actionButton} onClick={() => {fetchData(selectedTable); showNotification("Loading...");}}>
