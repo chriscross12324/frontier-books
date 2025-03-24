@@ -7,22 +7,12 @@ const BooksGrid = ({ books }) => {
     const [selectedBook, setSelectedBook] = useState(null);
     const { addToCart } = useContext(CartContext);
 
-    useEffect(() => {
-        fetch("https://findthefrontier.ca/frontier_books/books")
-            .then(response => response.json())
-            .then(data => {
-                console.log("API Response: ", data);
-                setBooks(data.books || []);
-            })
-            .catch(error => console.error("Failed to fetch books: ", error));
-    }, []);
-
     return (
         <div>
             <section className={styles.product_list}>
                 {books.map((book, index) => (
                     <article key={index} className={styles.product_item}>
-                        <img className={styles.product_image} src={book.cover_image_url} alt={book.title} onClick={() => {setSelectedBook(book); console.debug("Opening Dialog", book)}}></img>
+                        <img className={styles.product_image} src={book.cover_image_url} alt={book.title} onClick={() => {setSelectedBook(book);}}></img>
                         <p className={styles.book_title}>{book.title}</p>
                         <p className={styles.book_author}>by: {book.author}</p>
                         <div>
