@@ -4,6 +4,7 @@ import { useAuth } from "../services/AuthContext"
 import { useNotification } from "../components/Notification"
 import { IoClose } from "react-icons/io5";
 import { Link } from 'react-router';
+import PasswordInput from '../components/PasswordInput';
 
 export default function Register() {
     const { showNotification } = useNotification();
@@ -54,7 +55,7 @@ export default function Register() {
                 <form onSubmit={handleLogin}>
                     <input className={styles.credential_input} type="text" placeholder='Username' onChange={(e) => setUsername(e.target.value)}></input>
                     <input className={styles.credential_input} type="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)}></input>
-                    <input className={styles.credential_input} type="password" placeholder='Password' onChange={(e) => setPassword(e.target.value)}></input>
+                    <PasswordInput password={password} setPassword={setPassword}/>
                     <button className={styles.button}>Continue</button>
                 </form>
 
