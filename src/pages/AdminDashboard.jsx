@@ -1,23 +1,43 @@
 import styles from '../css/PageAdminDashboard.module.css'
-import { IoChevronBackOutline, IoReload, IoSaveOutline } from "react-icons/io5";
+import { IoChevronBackOutline, IoReload, IoSaveOutline, IoTrashOutline } from "react-icons/io5";
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from '../services/AuthContext';
 import { useNotification } from '../components/Notification';
+import { useDialog } from '../services/DialogContext';
 
 export default function AdminDashboard() {
-    const [selectedTable, setSelectedTable] = useState("inventory");
+    const [selectedTable, setSelectedTable] = useState("books");
     const [tableData, setTableData] = useState({});
 
     const { showNotification } = useNotification();
+    const { openDialogConfirm } = useDialog();
     const { getValidAccessToken } = useAuth();
 
-    const tableColumnHeaders = ({
-        "inventory": ["Item ID", "Authour", "Title", "Description", "Price"],
-        "users": ["User ID", "Email", "Username", "Role"],
-        "orders": ["Order ID", " User ID", "Items", "Cost", "Status"],
-    });
+    const tableColumnHeaders = {
+        "books": [
+            { name: "Book ID", editable: false }, 
+            { name: "Author", editable: true }, 
+            { name: "Title", editable: true }, 
+            { name: "Description", editable: true }, 
+            { name: "Price", editable: true }, 
+            { name: "Cover Image URL", editable: true }
+        ],
+        "users": [
+            { name: "User ID", editable: false },
+            { name: "Email", editable: true },
+            { name: "Username", editable: true },
+            { name: "Role", editable: true }
+        ],
+        "orders": [
+            { name: "Order ID", editable: false },
+            { name: "User ID", editable: false },
+            { name: "Items", editable: false },
+            { name: "Cost", editable: false },
+            { name: "Status", editable: true }
+        ],
+    };
 
     const navigate = useNavigate();
 
@@ -29,21 +49,23 @@ export default function AdminDashboard() {
 
     const fetchData = async (section) => {
         try {
-            const response = await fetch("https://findthefrontier.ca/frontier_books/users", {
+            console.debug("Fetching for: ", section)
+            const response = await fetch(`https://findthefrontier.ca/frontier_books/${section}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${getValidAccessToken()}`
                 },
             });
-            if (!response.ok) throw new Error("Error Getting Users");
+            if (!response.ok) throw new Error("Error Getting: ", section);
             const result = await response.json();
+            console.log("Result: ", result);
 
             setTableData((prevData) => ({
                 ...prevData,
-                [selectedTable]: result.users
+                [section]: result[section]
             }));
-            console.log(tableData);
+            console.log("Table Data: ", tableData);
             showNotification("Loaded Data");
         } catch (err) {
             console.log("Err: ", err.message);
@@ -62,47 +84,70 @@ export default function AdminDashboard() {
                         <h2 className={styles.navigationText}>Back</h2>
                     </div>
                     <ul>
-                        <li><button className={styles.buttonNavigation} onClick={() => {setSelectedTable("inventory")}}>Inventory</button></li>
-                        <li><button className={styles.buttonNavigation} onClick={() => {setSelectedTable("users")}}>Users</button></li>
-                        <li><button className={styles.buttonNavigation} onClick={() => {setSelectedTable("orders")}}>Orders</button></li>
+                        {Object.keys(tableColumnHeaders).map(key => (
+                            <li key={key}><button className={styles.buttonNavigation} onClick={() => {setSelectedTable(key)}}>{key.charAt(0).toUpperCase() + key.slice(1)}</button></li>
+                        ))}
                     </ul>
                 </div>
                 <div className={styles.paymentLayout}>
                     <div className={styles.paymentHeader}>
                         <h1 className={styles.sectionTitle}>{selectedTable}</h1>
                         <div className={styles.tableHeaderActions}>
-                            <button className={styles.actionButton} onClick={() => {showNotification("Saving...");}}>
-                                <IoSaveOutline className={styles.iconClose} />
-                            </button>
                             <button className={styles.actionButton} onClick={() => {fetchData(selectedTable); showNotification("Loading...");}}>
                                 <IoReload className={styles.iconClose} />
                             </button>
                         </div>
                     </div>
-                    
-                    <table className={styles.editableTable}>
-                        <thead>
-                            <tr>
-                                {tableColumnHeaders[selectedTable].map((title, index) => (
-                                    <th key={index}>{title}</th>
-                                ))}
-                            </tr>
-                            
-                        </thead>
-                        <tbody>
-                            {tableData[selectedTable] ? tableData[selectedTable].map((row) => (
-                                <tr key={row.user_id}>
-                                    {tableColumnHeaders[selectedTable].map((col, index) => (
-                                        <td key={index}>
-                                            <input 
-                                            type="text"
-                                            value={row[col.toLowerCase().replace(/\s+/g, "_")] || ""}/>
-                                        </td>
+                    <div className={styles.editableTableWrapper}>
+                        <table className={styles.editableTable}>
+                            <thead>
+                                <tr>
+                                    {tableColumnHeaders[selectedTable].map((title, index) => (
+                                        <th key={index}>{title.name}</th>
                                     ))}
                                 </tr>
-                            )) : (<p>No data available</p>)}
-                        </tbody>
-                    </table>
+                                
+                            </thead>
+                            <tbody>
+                                {tableData[selectedTable] ? tableData[selectedTable].map((row, rowIndex) => (
+                                    <tr key={row.user_id}>
+                                        {tableColumnHeaders[selectedTable].map((col, colIndex) => {
+
+                                            //const cellValue = row[col.name.toLowerCase().replace(/\s+/g, "_")];
+
+                                            // Debugging log: Check what data is being accessed
+                                            //console.log("Value for column", col.name, ":", cellValue);
+
+                                            return (
+                                                <td key={colIndex}>
+                                                    <input 
+                                                        className={styles.tableInput}
+                                                        type="text"
+                                                        value={row[col.name.toLowerCase().replace(/\s+/g, "_")] || ""}
+                                                        disabled={!col.editable}/>
+                                                    
+                                                </td>
+                                            );
+                                        })}
+                                        <td className={styles.rowActions}>
+                                            <button className={styles.actionButton} onClick={() => {
+                                                showNotification("Saving...");
+                                            }}><IoSaveOutline className={styles.iconClose} /></button>
+                                            <button className={styles.actionButton} onClick={() => {
+                                                openDialogConfirm({
+                                                    dialogTitle: "Permanently Delete Entry?", 
+                                                    dialogMessage: "This action cannot be undone. Are you sure you want to delete this entry?", 
+                                                    onConfirm: () => {
+                                                        showNotification("Deleting...");
+                                                    }
+                                                });
+                                            }}><IoTrashOutline className={styles.iconClose} /></button>
+                                        </td>
+                                    </tr>
+                                )) : (<p>No data available</p>)}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

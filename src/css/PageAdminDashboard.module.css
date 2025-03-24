@@ -61,7 +61,6 @@
     background: rgba(255, 255, 255, 0.1);
     font-size: 20px;
     cursor: pointer;
-    backdrop-filter: blur(5px);
     margin-bottom: 5px;
     text-align: center;
     font-size: 14px;
@@ -107,6 +106,13 @@
     margin-bottom: 10px;
 }
 
+.editableTableWrapper {
+    height: calc(100% - 40px);
+    width: 100%;
+    overflow: auto;
+    border-radius: 10px;
+}
+
 .sectionTitle {
     text-transform: capitalize;
     font-size: 32px;
@@ -121,21 +127,53 @@
 
 .editableTable {
     width: 100%;
+    min-width: max-content;
     border-collapse: collapse;
     background-color: rgba(255, 255, 255, 0.2);
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
+}
+
+.editableTable thead {
+    position: sticky;
+    top: 0;
+    background-color: rgb(93, 93, 93);
 }
 
 .editableTable th {
-    background-color: #007bff;
+    background-color: rgba(255, 255, 255, 0.0);
     color: white;
     padding: 5px 10px;
-    text-align: left;
+    text-align: center;
+    white-space: nowrap;
 }
 
 .editableTable td {
-    padding: 10px;
-    border: 1px solid #ddd;
+    padding: 2px;
+    border-style: solid;
+    border-width: 2px 1px;
+    border-color: rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.15);
+}
+
+.tableInput {
+    height: 30px;
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    padding: 0 5px
+}
+
+.tableInput:disabled {
+    color: rgb(255, 255, 255);
+    opacity: 0.65 !important;
+    font-weight: bold;
+}
+
+.rowActions {
+    display: flex;
+    flex-direction: row;
+    border-style: solid;
+    border-width: 1px !important;
+    border-color: rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.15);
+    gap: 2px;
 }

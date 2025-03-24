@@ -19,7 +19,6 @@ export function AuthProvider({ children }) {
 
         // Get User Role
         const tokenData = decodeAccessToken(token);
-        console.log(tokenData.user_role === "admin");
         setIsUserAdmin(tokenData.user_role === "admin");
     };
 
@@ -44,7 +43,6 @@ export function AuthProvider({ children }) {
     const decodeAccessToken = (accessToken) => {
         try {
             const payload = JSON.parse(atob(accessToken.split(".")[1]));
-            console.log(payload);
             return payload && payload.exp ? payload : null;
         } catch {
             return null;

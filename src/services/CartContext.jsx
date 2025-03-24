@@ -65,10 +65,6 @@ export const CartProvider = ({ children }) => {
                 quantity: data.cart_items.find(item => item.book_id === book.book_id)?.quantity || 0
             }));
 
-            console.debug("Local Cart Datils: ", JSON.parse(localStorage.getItem("cart")) || { items: [], last_updated: 0 })
-            console.debug("Loaded Book Details: ", updatedBookDetails);
-            console.debug("Remote Cart Details: ", data.cart_items);
-
             setCart(updatedBookDetails);
         } catch (err) {
             console.error("Error fetching cart: ", err);
