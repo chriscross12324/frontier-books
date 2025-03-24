@@ -9,12 +9,18 @@ export function AuthProvider({ children }) {
     const { openDialogConfirm } = useDialog();
     const { showNotification } = useNotification();
     const [isAuthenticated, setIsAuthenticated] = useState(Boolean(localStorage.getItem("frontierBooks_access_token")));
+    const [isUserAdmin, setIsUserAdmin] = useState(false);
     const navigate = useNavigate();
 
     // --- Store the Access Token in localStorage and Update the Authentication State ---
     const login = (token) => {
         localStorage.setItem("frontierBooks_access_token", token);
         setIsAuthenticated(true);
+
+        // Get User Role
+        const tokenData = decodeAccessToken(token);
+        console.log(tokenData.user_role === "admin");
+        setIsUserAdmin(tokenData.user_role === "admin");
     };
 
     // --- Remove the Access Token from localStorage and Update the Authentication State ---
@@ -25,6 +31,7 @@ export function AuthProvider({ children }) {
             onConfirm: () => {
                 localStorage.removeItem("frontierBooks_access_token");
                 setIsAuthenticated(false);
+                setIsUserAdmin(false);
                 showNotification("Signed Out");
             }
         });
@@ -37,6 +44,7 @@ export function AuthProvider({ children }) {
     const decodeAccessToken = (accessToken) => {
         try {
             const payload = JSON.parse(atob(accessToken.split(".")[1]));
+            console.log(payload);
             return payload && payload.exp ? payload : null;
         } catch {
             return null;
@@ -93,11 +101,13 @@ export function AuthProvider({ children }) {
             return null;
         }
 
+        setIsUserAdmin(tokenData.user_role === "admin");
+        
         return accessToken;
     }
 
     return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, getValidAccessToken }}>
+        <AuthContext.Provider value={{ isAuthenticated, isUserAdmin, login, logout, getValidAccessToken }}>
             {children}
         </AuthContext.Provider>
     );

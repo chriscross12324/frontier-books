@@ -7,6 +7,7 @@ import Contact from './pages/Contact.jsx'
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
+import AdminDashboard from './pages/AdminDashboard.jsx'
 import { CartProvider } from './services/CartContext.jsx'
 import { NotificationProvider } from './components/Notification.jsx'
 import { AuthProvider } from './services/AuthContext.jsx'
@@ -26,6 +27,7 @@ createRoot(root).render(
               <Route path='/contact' element={<Contact />} />
               <Route path='/login' element={<Login />} />
               <Route path='/register' element={<Register />} />
+              <Route path='/admin' element={<AdminDashboard />} />
             </Routes>
           </CartProvider>
         </AuthProvider>

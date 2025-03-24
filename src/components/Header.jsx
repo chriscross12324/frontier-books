@@ -9,7 +9,7 @@ import { Link } from "react-router";
 
 const Header = () => {
     const { cart, isCartSaved, saveLocalCart } = useContext(CartContext);
-    const { isAuthenticated, logout } = useAuth();
+    const { isAuthenticated, isUserAdmin, logout } = useAuth();
     const [isCartOpen, setIsCartOpen] = useState(false);
 
     const toggleCart = () => setIsCartOpen(!isCartOpen);
@@ -59,8 +59,10 @@ const Header = () => {
                             </div>
                         )}
                     </div>
-                    
-                    <Link to="/" className={styles.sign_in} onClick={logout}>Account</Link>
+
+                    {isUserAdmin ?? (<Link to="/" className={styles.sign_in}>Admin Dashboard</Link>)}
+                    <Link to="/admin" className={styles.sign_in}>Admin Dashboard</Link>
+                    <Link to="/" className={styles.sign_in} onClick={logout}>Sign Out</Link>
                 </div>
             ) : (
                 <Link to="/login">Sign In</Link>
