@@ -2,7 +2,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 20px;
+    padding: 10px 20px;
     background-color: rgb(39, 57, 28);
     border-bottom: 2px solid rgba(0, 0, 0, 0.25);
 }
@@ -30,6 +30,15 @@ a {
     text-decoration: none;
     color: rgb(214, 247, 214);
     font-weight: 500;
+}
+
+.searchInput {
+    height: 40px;
+    width: min(25%, 400px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.025);
+    border-radius: 20px;
+    padding: 0 20px;
 }
 
 .header_right {

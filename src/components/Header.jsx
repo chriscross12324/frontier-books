@@ -26,6 +26,8 @@ const Header = () => {
                 </nav>
             </div>
 
+            <input className={styles.searchInput} type="text" placeholder="Search..."/>
+
             {isAuthenticated ? (
                 <div className={styles.header_right}>
                     <div className={styles.cart_container}>
