@@ -1,4 +1,4 @@
-import styles from '../css/PageLogin.module.css'
+import styles from '../css/PageLoginRegister.module.css'
 
 import { useState } from "react"
 import { IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
@@ -8,7 +8,7 @@ const PasswordInput = ({ password, setPassword }) => {
 
     return (
         <div style={{ position: "relative", width: "100%", alignItems: "center" }}>
-            <input className={styles.credential_input} 
+            <input className={styles.inputCredential} 
                 type={showPassword ? "text" : "password"} 
                 placeholder='Password' 
                 value={password}

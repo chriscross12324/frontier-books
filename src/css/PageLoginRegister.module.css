@@ -1,4 +1,4 @@
-.login_page_background {
+.pageBackground {
     height: 100vh;
     display: flex;
     background-image: linear-gradient( rgba(0, 0, 0, 0.315), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1481627834876-b7833e8f5570?q=80&w=1828&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
@@ -10,10 +10,16 @@
     margin: 0 auto;
 }
 
-.login_container {
+.pageContainerHolder {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    gap: 5px;
+}
+
+.container {
     width: 350px;
     padding: 20px;
-    margin: auto;
     background-color: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(20px);
     border: 1.5px solid rgba(255, 255, 255, 0.1);
@@ -23,7 +29,7 @@
     box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
 }
 
-.button_close {
+.buttonClose {
     height: 35px;
     width: 35px;
     display: flex;
@@ -39,12 +45,16 @@
     backdrop-filter: blur(5px);
 }
 
-.icon_close {
+.buttonClose:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.iconClose {
     font-size: 22px;
     width: 100%;
 }
 
-.login_title {
+.pageTitle {
     font-size: xx-large;
     font-weight: bolder;
     margin-top: 10px;
@@ -52,7 +62,7 @@
     color: rgb(255, 255, 255);
 }
 
-.login_description {
+.pageDescription {
     font-size: 15px;
     font-weight: bold;
     line-height: 1.2;
@@ -62,14 +72,7 @@
     margin-right: 5px;
 }
 
-.forgot_password {
-    font-size: small;
-    font-weight: bold;
-    color: rgba(0, 0, 0, 0.75);
-    margin-bottom: 30px;
-}
-
-.credential_input {
+.inputCredential {
     height: 40px;
     width: 100%;
     background-color: rgba(0, 0, 0, 0.493);
@@ -81,15 +84,21 @@
     margin-bottom: 5px;
 }
 
-.button {
+.buttonContinue {
     height: 40px;
     width: 100%;
-    background-color: rgba(0, 0, 0, 0.75);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.05);
     border-radius: 20px;
     cursor: pointer;
     margin-top: 30px;
     margin-bottom: 10px;
+    font-size: small;
+}
+
+.buttonContinue:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.025);
 }
 
 .error {
@@ -99,18 +108,27 @@
     color: rgba(255, 35, 35, 0.75);
 }
 
-.button_create_account {
-    height: 30px;
-    /* width: 100%;
-    display: flex;
-    align-items: center; */
-    padding: 0 8px 0 8px;
-    border-radius: 20px;
+.noteTogglePage {
     font-size: 14px;
+    line-height: 1.2;
     color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 15px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
-.button_create_account:hover {
-    color: white;
-    background-color: black;
+.buttonTogglePage {
+    height: 30px;
+    padding: 0 8px 0 8px;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: small;
+}
+
+.buttonTogglePage:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.025);
 }

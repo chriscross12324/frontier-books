@@ -1,4 +1,4 @@
-.item_card {
+.itemCard {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -9,19 +9,14 @@
     gap: 8px;
 }
 
-.item_info {
-    display: flex;
-    gap: 18px;
-}
-
-.item_image {
+.itemImage {
     width: 50px;
     height: 75px;
     object-fit: cover;
     border-radius: 4px;
 }
 
-.item_footer {
+.itemFooter {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -29,14 +24,14 @@
     gap: 4px;
 }
 
-.item_author {
+.itemAuthor {
     font-size: 12px;
     font-weight: normal;
     color: rgba(255, 255, 255, 0.4);
     flex: 1;
 }
 
-.item_title {
+.itemTitle {
     font-size: 14px;
     font-weight: bold;
     line-height: 1.1;
@@ -44,7 +39,7 @@
     flex: 1;
 }
 
-.quantity_pricing {
+.quantityPricing {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -52,50 +47,51 @@
     color: rgba(255, 255, 255, 0.75);
 }
 
-.quantity_controls {
+.quantityControls {
     display: flex;
     align-items: center;
     gap: 2px;
 }
 
-.button_change_quantity {
+.buttonChangeQuantity {
     height: 30px;
     width: 30px;
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.05);
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
     cursor: pointer;
     color: rgb(255, 255, 255);
 }
 
-.button_change_quantity:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.buttonChangeQuantity:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.025);
 }
 
-.icon_change_quantity {
+.iconChangeQuantity {
     font-size: 18px;
 }
 
-.item_quantity {
+.itemQuantity {
     height: 30px;
     width: 60px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.05);
     text-align: center;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.75);
     font-weight: bold;
 }
 
-.item_price {
+.itemPrice {
     font-size: 18px;
     font-weight: bold;
 }
 
-.remove_button {
+.buttonRemoveItem {
     height: 30px;
     width: 30px;
     font-size: 16px;
@@ -105,11 +101,13 @@
     background-color: transparent;
     border: none;
     border-radius: 8px;
-    color: #777;
+    color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
+    margin-left: 5px;
 }
 
-.remove_button:hover {
+.buttonRemoveItem:hover {
     background-color: rgba(255, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.05);
     color: rgb(255, 255, 255);
 }

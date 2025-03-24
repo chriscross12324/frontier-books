@@ -10,15 +10,15 @@ const BookDialog = ({ book, onClose }) => {
             if (e.target === e.currentTarget) onClose();
         }}>
             <div className={styles.dialog}>
-                <button className={styles.button_close} onClick={onClose}>
-                    <IoClose className={styles.icon_close} />
+                <button className={styles.buttonClose} onClick={onClose}>
+                    <IoClose className={styles.iconClose} />
                 </button>
-                <img src={book.cover_image_url} alt={book.title} className={styles.image_cover} />
-                <div className={styles.container_details}>
-                    <h2 className={styles.text_title}>{book.title}</h2>
-                    <p className={styles.text_author}><strong>Author:</strong> {book.author}</p>
-                    <p className={styles.text_price}><strong>Price:</strong> ${book.price.toFixed(2)}</p>
-                    <p className={styles.text_description}>{book.description}</p>
+                <img src={book.cover_image_url} alt={book.title} className={styles.imageCover} />
+                <div className={styles.containerDetails}>
+                    <h2 className={styles.textTitle}>{book.title}</h2>
+                    <p className={styles.textAuthor}><strong>Author:</strong> {book.author}</p>
+                    <p className={styles.textPrice}><strong>Price:</strong> ${book.price.toFixed(2)}</p>
+                    <p className={styles.textDescription}>{book.description}</p>
                 </div>
             </div>
         </div>

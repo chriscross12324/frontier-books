@@ -1,9 +1,9 @@
-import styles from '../css/PageLogin.module.css'
+import styles from '../css/PageLoginRegister.module.css'
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from "../services/AuthContext"
 import { useNotification } from "../components/Notification"
 import { IoClose } from "react-icons/io5";
-import { Link } from 'react-router';
 import PasswordInput from '../components/PasswordInput';
 
 export default function Login() {
@@ -12,6 +12,8 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
+
+    const navigate = useNavigate();
 
     async function handleLogin(e) {
         e.preventDefault();
@@ -44,23 +46,33 @@ export default function Login() {
     }
 
     return (
-        <div className={styles.login_page_background}>
-            <div className={styles.login_container}>
-                <button className={styles.button_close} onClick={() => location.href = '/'}>
-                    <IoClose className={styles.icon_close} />
-                </button>
-                <h1 className={styles.login_title}>Sign-In</h1>
-                <h2 className={styles.login_description}>Continue browsing the best book selection available.</h2>
-                <form onSubmit={handleLogin}>
-                    <input className={styles.credential_input} type="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)}></input>
-                    <PasswordInput password={password} setPassword={setPassword}/>
-                    <button className={styles.button}>Continue</button>
-                </form>
+        <div className={styles.pageBackground}>
+            <div className={styles.pageContainerHolder}>
+                <div className={styles.container}>
+                    <button className={styles.buttonClose} onClick={() => location.href = '/'}>
+                        <IoClose className={styles.iconClose} />
+                    </button>
+                    <h1 className={styles.pageTitle}>Sign-In</h1>
+                    <h2 className={styles.pageDescription}>Continue browsing the best book selection available.</h2>
+                    <form onSubmit={handleLogin}>
+                        <input className={styles.inputCredential} type="email" placeholder='Email' onChange={(e) => setEmail(e.target.value)}></input>
+                        <PasswordInput password={password} setPassword={setPassword}/>
+                        <button className={styles.buttonContinue}>Continue</button>
+                    </form>
 
-                <Link to="/register" className={styles.button_create_account}>Create Account</Link>
-                {error && <p className={styles.error}>{error}</p>}
+                    {/* <Link to="/register" className={styles.button_create_account}>Create Account</Link> */}
+                    {error && <p className={styles.error}>{error}</p>}
+                </div>
+                <div className={styles.container}>
+                    <h3 className={styles.noteTogglePage}>Don't have an account yet?</h3>
+                    <button className={styles.buttonTogglePage} onClick={() => {navigate("/register");}}>Create Account</button>
+                </div>
             </div>
+            
         </div>
+
+
+        
         
     );
 }

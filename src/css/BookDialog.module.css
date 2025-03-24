@@ -29,7 +29,7 @@
     box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
 }
 
-.button_close {
+.buttonClose {
     height: 35px;
     width: 35px;
     display: flex;
@@ -40,17 +40,20 @@
     border: none;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
-    font-size: 20px;
     cursor: pointer;
     backdrop-filter: blur(5px);
 }
 
-.icon_close {
+.buttonClose:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.iconClose {
     font-size: 22px;
     width: 100%;
 }
 
-.image_cover {
+.imageCover {
     width: 367px;
     height: 400px;
     object-fit: cover;
@@ -58,11 +61,11 @@
     margin-right: 20px;
 }
 
-.container_details {
+.containerDetails {
     overflow-y: auto;
 }
 
-.text_title {
+.textTitle {
     color: white;
     font-weight: bold;
     text-align: start;
@@ -71,18 +74,18 @@
     margin-bottom: 10px;
 }
 
-.text_author {
+.textAuthor {
     color: rgba(255, 255, 255, 0.75);
     text-align: start;
 }
 
-.text_price {
+.textPrice {
     color: rgba(255, 255, 255, 0.75);
     text-align: start;
     margin-bottom: 10px;
 }
 
-.text_description {
+.textDescription {
     color: rgba(255, 255, 255, 0.75);
     text-align: start;
 }
