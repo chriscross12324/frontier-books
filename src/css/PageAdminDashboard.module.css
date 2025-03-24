@@ -36,13 +36,11 @@
     margin-bottom: 10px;
 }
 
-.buttonClose {
+.actionButton {
     height: 35px;
     width: 35px;
     display: flex;
     align-items: center;
-    top: 10px;
-    right: 10px;
     border: none;
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.1);
@@ -105,6 +103,7 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 10px;
 }
 
@@ -112,4 +111,31 @@
     text-transform: capitalize;
     font-size: 32px;
     color: rgb(255, 255, 255);
+}
+
+.tableHeaderActions {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.editableTable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.editableTable th {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.editableTable td {
+    padding: 10px;
+    border: 1px solid #ddd;
 }
