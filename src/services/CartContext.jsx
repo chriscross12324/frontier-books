@@ -74,6 +74,8 @@ export const CartProvider = ({ children }) => {
 
     // --- Push Local Cart to Remote ---
     const saveLocalCart = async () => {
+        if (isCartSaved.current) return;
+
         // Check User is Logged In
         const accessToken = getValidAccessToken();
         if (!accessToken) return null;
@@ -81,9 +83,6 @@ export const CartProvider = ({ children }) => {
         try {
             // Get Local Cart
             const localCart = JSON.parse(localStorage.getItem("cart")) || { items: [] };
-
-            // Ensure Cart Contains Items
-            //if (localCart.length <= 0) return null;
 
             // Push Local Cart to Remote
             const response = await fetch("https://findthefrontier.ca/frontier_books/cart", {
