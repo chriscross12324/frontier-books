@@ -30,7 +30,7 @@ export default function Login() {
                 console.log(data);
                 if (data.access_token) {
                     login(data.access_token);
-                    location.href = '/';
+                    navigate("/");
                     setError(null);
                     showNotification("Login Successful!")
                 } else {
