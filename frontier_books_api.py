@@ -640,6 +640,7 @@ async def verify_admin(authorization: str = Header(None)):
     
     return user
 
+# --- Modify Existing Entry ---
 @app.put("/modify/{entity}/{entity_id}")
 async def modify_entry(entity_id: int, entity: str, data: dict, user=Depends(verify_admin), db=Depends(lease_db_connection)):
     try: 
@@ -692,6 +693,48 @@ async def modify_entry(entity_id: int, entity: str, data: dict, user=Depends(ver
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Updating Element: {str(e)}"
+        )
+    
+# --- Delete Existing Entry ---
+@app.put("/remove/{entity}/{entity_id}")
+async def remove_entry(entity: str, entity_id: int, user=Depends(verify_admin), db=Depends(lease_db_connection)):
+    try:
+        accepted_entities = {"books": "book_id", "users": "user_id", "orders": "order_id"}
+        if entity not in accepted_entities:
+            raise HTTPException(status_code=400, detail="Invalid entity type")
+        
+        id_field = accepted_entities[entity]
+        existing_entry = await db.fetchrow(f"SELECT * FROM {entity} WHERE {id_field} = $1", entity_id)
+        if not existing_entry:
+            raise HTTPException(status_code=404, detail=f"{entity} not found")
+        
+        async with db.transaction():
+            await db.execute(f"DELETE FROM {entity} WHERE {id_field} = $1", entity_id)
+
+        return {
+            "status_code": status.HTTP_200_OK,
+            "detail": f"{entity[:-1].capitalize()} removed successfully"
+        }
+
+    except HTTPException as e:
+        raise e
+
+    except asyncpg.UniqueViolationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error Removing Element: Violation Error"
+        )
+
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Removing Element: Database Error ({str(e)})"
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Removing Element: {str(e)}"
         )
 
 
