@@ -89,7 +89,7 @@ export default function AdminDashboard() {
                 users: row.user_id,
                 orders: row.order_id
             };
-            
+
             const elementID = idMap[selectedTable] || null;
             const response = await fetch(`https://findthefrontier.ca/frontier_books/modify/${selectedTable}/${elementID}`, {
                 method: "PUT",
@@ -108,6 +108,31 @@ export default function AdminDashboard() {
             console.error("Save Error: ", err);
         }
     };
+
+    const handleDelete = async (row) => {
+        try {
+            const idMap = {
+                books: row.book_id,
+                users: row.user_id,
+                orders: row.order_id
+            };
+
+            const elementID = idMap[selectedTable] || null;
+            const response = await fetch(`https://findthefrontier.ca/frontier_books/remove/${selectedTable}/${elementID}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getValidAccessToken()}`
+                },
+            });
+
+            if (!response.ok) throw new Error("Failed to delete entry");
+            showNotification("Entry Deleted Successfully!");
+        } catch (err) {
+            showNotification("Error Deleting Entry")
+            console.error("Error Deleting Entry: ", err);
+        }
+    }
 
     return (
         <div className={styles.pageRootLayout}>
@@ -169,6 +194,7 @@ export default function AdminDashboard() {
                                                     dialogMessage: "This action cannot be undone. Are you sure you want to delete this entry?", 
                                                     onConfirm: () => {
                                                         showNotification("Deleting...");
+                                                        handleDelete(row);
                                                     }
                                                 });
                                             }}><IoTrashOutline className={styles.iconClose} /></button>
