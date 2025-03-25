@@ -84,21 +84,20 @@ export default function AdminDashboard() {
 
     const handleSave = async (row) => {
         try {
-            const updatedRow = {
-                book_title: row.title,
-                book_author: row.author,
-                book_description: row.description,
-                book_price: row.price,
-                book_cover_image_url: row.cover_image_url,
+            const idMap = {
+                books: row.book_id,
+                users: row.user_id,
+                orders: row.order_id
             };
-
-            const response = await fetch(`https://findthefrontier.ca/frontier_books/${selectedTable}/${row.book_id}`, {
+            
+            const elementID = idMap[selectedTable] || null;
+            const response = await fetch(`https://findthefrontier.ca/frontier_books/modify/${selectedTable}/${elementID}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${getValidAccessToken()}`
                 },
-                body: JSON.stringify(updatedRow),
+                body: JSON.stringify(row),
             });
 
             if (!response.ok) throw new Error("Failed to save changes");
