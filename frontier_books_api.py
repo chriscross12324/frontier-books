@@ -237,6 +237,46 @@ async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error Creating User: {str(e)}"
         )
+    
+# --- Get all User Accounts ---
+@app.get("/users")
+async def get_all_users(authorization: str = Header(None), db=Depends(lease_db_connection)):
+    try:
+        # Check if Authorization Header is present and correctly formated
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=404, detail="Invalid or missing access token")
+        
+        #Extract access token
+        access_token = authorization.split("Bearer ")[1]
+
+        # Get requesting user's role
+        user = decode_access_token(access_token)
+        if not user['user_role'] == 'admin':
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Error Getting Users: Unauthorized"
+            )
+        
+        all_users = await db.fetch("SELECT user_id, username, email, role from users ORDER BY user_id ASC")
+        return {
+            "status_code": status.HTTP_200_OK,
+            "users": all_users
+        }
+
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Users: Database Error ({str(e)})"
+        )
+    
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Users: {str(e)}"
+        )
 
 # --- Login to an Account ---
 @app.post("/login")
@@ -318,6 +358,65 @@ async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_
         return {
             "status_code": status.HTTP_200_OK,
             "detail": f"Book added successfully {str(book_id)}"
+        }
+
+    except asyncpg.UniqueViolationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error Adding Book: Violation Error"
+        )
+
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Adding Book: Database Error ({str(e)})"
+        )
+
+    except HTTPException as e:
+        raise e
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Adding Book: {str(e)}"
+        )
+    
+# --- Modify Existing Book ---
+@app.put("/books/{book_id}")
+async def update_book(book_id: int, book_data: Post_Book, authorization: str = Header(None), db=Depends(lease_db_connection)):
+    try:
+        # Check if Authorization Header is present and correctly formated
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=404, detail="Invalid or missing access token")
+        
+        #Extract access token
+        access_token = authorization.split("Bearer ")[1]
+
+        # Get requesting user's id
+        user = decode_access_token(access_token)
+        if not user['user_role'] == 'admin':
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Error Updating Book: Unauthorized"
+            )
+        
+        # Check if book exists
+        existing_book = await db.fetchrow("SELECT * FROM books WHERE book_id = $1", book_id)
+        if not existing_book:
+            raise HTTPException(status_code=404, detail="Book not found")
+
+        async with db.transaction():
+            result = await db.execute(
+                "UPDATE books SET title = $1, author = $2, description = $3, price = $4, cover_image_url = $5 "
+                "WHERE book_id = $6",
+                book_data.book_title, book_data.book_author, book_data.book_description,
+                book_data.book_price, book_data.book_cover_image_url, book_id
+            )
+
+        # Return success message and book id
+        return {
+            "status_code": status.HTTP_200_OK,
+            "detail": f"Book updated successfully"
         }
 
     except asyncpg.UniqueViolationError:
@@ -538,6 +637,16 @@ async def checkout(order: Post_Order, db=Depends(lease_db_connection)):
 async def get_orders(user_id: int, db=Depends(lease_db_connection)):
     try:
         orders = await db.fetch("SELECT * FROM orders WHERE user_id = $1", user_id)
+    except Exception as e:
+        print(f"Failed: {str(e)}")
+    if not orders:
+        raise HTTPException(status_code=404, detail="No orders found for this user")
+    return {"orders": orders}
+
+@app.get("/orders")
+async def get_orders(db=Depends(lease_db_connection)):
+    try:
+        orders = await db.fetch("SELECT * FROM orders")
     except Exception as e:
         print(f"Failed: {str(e)}")
     if not orders:
