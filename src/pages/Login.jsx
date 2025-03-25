@@ -23,7 +23,7 @@ export default function Login() {
         fetch("https://findthefrontier.ca/frontier_books/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: 0, user_name: "test", user_email: email, user_password: password }),
+            body: JSON.stringify({ user_id: 0, user_name: "test", user_email: email, user_password: password, user_role: "user" }),
         })
             .then((response) => response.json())
             .then((data) => {

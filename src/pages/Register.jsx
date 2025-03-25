@@ -24,7 +24,7 @@ export default function Register() {
         fetch("https://findthefrontier.ca/frontier_books/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: 0, user_name: username, user_email: email, user_password: password }),
+            body: JSON.stringify({ user_id: 0, user_name: username, user_email: email, user_password: password, user_role: "user" }),
         })
             .then((response) => response.json())
             .then((data) => {
