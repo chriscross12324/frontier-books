@@ -73,6 +73,43 @@ export default function AdminDashboard() {
         }
     };
 
+    const handleInputChange = (rowIndex, colName, newValue) => {
+        setTableData((prevData) => ({
+            ...prevData,
+            [selectedTable]: prevData[selectedTable].map((row, index) =>
+                index === rowIndex ? { ...row, [colName]: newValue } : row
+            ),
+        }));
+    };
+
+    const handleSave = async (row) => {
+        try {
+            const updatedRow = {
+                book_title: row.title,
+                book_author: row.author,
+                book_description: row.description,
+                book_price: row.price,
+                book_cover_image_url: row.cover_image_url,
+            };
+
+            const response = await fetch(`https://findthefrontier.ca/frontier_books/${selectedTable}/${row.book_id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getValidAccessToken()}`
+                },
+                body: JSON.stringify(updatedRow),
+            });
+
+            if (!response.ok) throw new Error("Failed to save changes");
+
+            showNotification("Changes saved!");
+        } catch (err) {
+            showNotification("Error Saving Changes")
+            console.error("Save Error: ", err);
+        }
+    };
+
     return (
         <div className={styles.pageRootLayout}>
             <div className={styles.rowLayout}>
@@ -106,32 +143,26 @@ export default function AdminDashboard() {
                                         <th key={index}>{title.name}</th>
                                     ))}
                                 </tr>
-                                
                             </thead>
                             <tbody>
                                 {tableData[selectedTable] ? tableData[selectedTable].map((row, rowIndex) => (
                                     <tr key={row.user_id}>
-                                        {tableColumnHeaders[selectedTable].map((col, colIndex) => {
-
-                                            //const cellValue = row[col.name.toLowerCase().replace(/\s+/g, "_")];
-
-                                            // Debugging log: Check what data is being accessed
-                                            //console.log("Value for column", col.name, ":", cellValue);
-
-                                            return (
-                                                <td key={colIndex}>
-                                                    <input 
-                                                        className={styles.tableInput}
-                                                        type="text"
-                                                        value={row[col.name.toLowerCase().replace(/\s+/g, "_")] || ""}
-                                                        disabled={!col.editable}/>
-                                                    
-                                                </td>
-                                            );
-                                        })}
+                                        {tableColumnHeaders[selectedTable].map((col, colIndex) => (
+                                            <td key={colIndex}>
+                                                <input 
+                                                    className={styles.tableInput}
+                                                    type="text"
+                                                    value={row[col.name.toLowerCase().replace(/\s+/g, "_")] || ""}
+                                                    disabled={!col.editable}
+                                                    onChange={(e) => handleInputChange(rowIndex, col.name.toLowerCase().replace(/\s+/g, "_"), e.target.value)}
+                                                />
+                                            </td>
+                                        ))}
                                         <td className={styles.rowActions}>
                                             <button className={styles.actionButton} onClick={() => {
                                                 showNotification("Saving...");
+                                                handleSave(row);
+                                                console.debug(row);
                                             }}><IoSaveOutline className={styles.iconClose} /></button>
                                             <button className={styles.actionButton} onClick={() => {
                                                 openDialogConfirm({
