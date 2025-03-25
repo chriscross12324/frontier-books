@@ -81,6 +81,7 @@ class General_User(BaseModel):
     user_name: str
     user_email: str
     user_password: str
+    user_role: str
 
 class General_CartItem(BaseModel):
     book_id: int
@@ -198,9 +199,9 @@ async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
     try:
         async with db.transaction():
             result = await db.execute(
-                "INSERT INTO users (username, email, password_hash, created_at) "
-                "VALUES ($1, $2, $3, $4) RETURNING user_id",
-                user_data.user_name, user_data.user_email, hash_password(user_data.user_password), datetime.now(timezone.utc)
+                "INSERT INTO users (username, email, password_hash, created_at, role) "
+                "VALUES ($1, $2, $3, $4, $5) RETURNING user_id",
+                user_data.user_name, user_data.user_email, hash_password(user_data.user_password), datetime.now(timezone.utc), "user"
             )
 
         # Retrieve user id from result
@@ -381,64 +382,6 @@ async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_
             detail=f"Error Adding Book: {str(e)}"
         )
     
-# --- Modify Existing Book ---
-@app.put("/books/{book_id}")
-async def update_book(book_id: int, book_data: Post_Book, authorization: str = Header(None), db=Depends(lease_db_connection)):
-    try:
-        # Check if Authorization Header is present and correctly formated
-        if not authorization or not authorization.startswith("Bearer "):
-            raise HTTPException(status_code=404, detail="Invalid or missing access token")
-        
-        #Extract access token
-        access_token = authorization.split("Bearer ")[1]
-
-        # Get requesting user's id
-        user = decode_access_token(access_token)
-        if not user['user_role'] == 'admin':
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Error Updating Book: Unauthorized"
-            )
-        
-        # Check if book exists
-        existing_book = await db.fetchrow("SELECT * FROM books WHERE book_id = $1", book_id)
-        if not existing_book:
-            raise HTTPException(status_code=404, detail="Book not found")
-
-        async with db.transaction():
-            result = await db.execute(
-                "UPDATE books SET title = $1, author = $2, description = $3, price = $4, cover_image_url = $5 "
-                "WHERE book_id = $6",
-                book_data.book_title, book_data.book_author, book_data.book_description,
-                book_data.book_price, book_data.book_cover_image_url, book_id
-            )
-
-        # Return success message and book id
-        return {
-            "status_code": status.HTTP_200_OK,
-            "detail": f"Book updated successfully"
-        }
-
-    except asyncpg.UniqueViolationError:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Error Adding Book: Violation Error"
-        )
-
-    except asyncpg.PostgresError as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error Adding Book: Database Error ({str(e)})"
-        )
-
-    except HTTPException as e:
-        raise e
-
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error Adding Book: {str(e)}"
-        )
 
 # --- Retrieve All Books in Random Order ---
 @app.get("/books")
@@ -672,6 +615,85 @@ async def get_reviews(book_id: int, db=Depends(lease_db_connection)):
     if not reviews:
         raise HTTPException(status_code=404, detail="No reviews found for this book")
     return {"reviews": reviews}
+
+
+# ========================================
+# API Endpoints - Admin Only
+# ========================================
+
+# --- Verify the User is an Admin ---
+async def verify_admin(authorization: str = Header(None)):
+    # Check if Authorization Header is present and correctly formated
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=404, detail="Invalid or missing access token")
+    
+    # Extract access token
+    access_token = authorization.split("Bearer ")[1]
+    user = decode_access_token(access_token)
+
+    # Confirm user is admin
+    if not user['user_role'] == 'admin':
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized"
+        )
+    
+    return user
+
+@app.put("/modify/{entity}/{entity_id}")
+async def modify_entry(entity_id: int, entity: str, data: dict, user=Depends(verify_admin), db=Depends(lease_db_connection)):
+    try: 
+        table_map = {
+            "books": ("book_id", ["title", "author", "description", "price", "cover_image_url"]),
+            "users": ("user_id", ["username", "email", "role"]),
+            "orders": ("order_id", ["order_status"])
+        }
+
+        if entity not in table_map:
+            raise HTTPException(status_code=400, detail="Invalid entity type")
+        
+        id_field, allowed_fields = table_map[entity]
+
+        existing_entry = await db.fetchrow(f"SELECT * FROM {entity} WHERE {id_field} = $1", entity_id)
+        if not existing_entry:
+            raise HTTPException(status_code=404, detail=f"{entity} not found")
+        
+        update_data = {k: v for k, v in data.items() if k in allowed_fields}
+        if not update_data:
+            raise HTTPException(status_code=400, detail="No valid fields to update")
+        
+        fields = ", ".join([f"{key} = ${i+1}" for i, key in enumerate(update_data.keys())])
+        values = list(update_data.values()) + [entity_id]
+
+        async with db.transaction():
+            await db.execute(f"UPDATE {entity} SET {fields} WHERE {id_field} = ${len(values)}", *values)
+
+        return {
+            "status_code": status.HTTP_200_OK,
+            "detail": f"{entity[:-1].capitalize()} updated successfully"
+        }
+    
+    except HTTPException as e:
+        raise e
+
+    except asyncpg.UniqueViolationError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Error Updating Element: Violation Error"
+        )
+
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Updating Element: Database Error ({str(e)})"
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Updating Element: {str(e)}"
+        )
+
 
 
 ## Random Fun
