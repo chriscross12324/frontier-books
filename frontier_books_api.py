@@ -198,14 +198,14 @@ def hash_password(plaintext_password: str) -> str:
 async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
     try:
         async with db.transaction():
-            result = await db.execute(
-                "INSERT INTO users (username, email, password_hash, created_at, role) "
-                "VALUES ($1, $2, $3, $4, $5) RETURNING user_id",
-                user_data.user_name, user_data.user_email, hash_password(user_data.user_password), datetime.now(timezone.utc), "user"
+            result = await db.fetchval(
+                "INSERT INTO users (username, email, password_hash, created_at) "
+                "VALUES ($1, $2, $3, $4) RETURNING user_id",
+                user_data.user_name, user_data.user_email, hash_password(user_data.user_password), datetime.now(timezone.utc),
             )
 
         # Retrieve user id from result
-        user_id = result[0]['user_id']
+        user_id = result
 
         # New account role is 'user'
         user_role = "user"
