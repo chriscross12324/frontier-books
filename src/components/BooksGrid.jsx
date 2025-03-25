@@ -5,7 +5,7 @@ import BookDialog from "./BookDialog";
 
 const BooksGrid = ({ books }) => {
     const [selectedBook, setSelectedBook] = useState(null);
-    const { addToCart } = useContext(CartContext);
+    const { isCartSaved, saveLocalCart, addToCart } = useContext(CartContext);
 
     return (
         <div>
@@ -16,7 +16,7 @@ const BooksGrid = ({ books }) => {
                         <p className={styles.book_title}>{book.title}</p>
                         <p className={styles.book_author}>by: {book.author}</p>
                         <div>
-                            <button className={styles.button_add} onClick={() => {addToCart(book);}}>Add to Cart</button>
+                            <button className={styles.button_add} onClick={() => {addToCart(book); isCartSaved.current = false; saveLocalCart();}}>Add to Cart</button>
                             <div className={styles.book_price_container}>
                                 <p className={styles.book_price_text}>${book.price.toFixed(2)}</p>
                             </div>
