@@ -29,14 +29,14 @@ export const DialogProvider = ({ children }) => {
             {dialog &&
                 createPortal(
                     <div className={styles.overlay}>
-                        <div className={styles.dialog_container}>
-                            <h1 className={styles.dialog_title}>{dialog.dialogTitle}</h1>
-                            <h2 className={styles.dialog_message}>{dialog.dialogMessage}</h2>
-                            <div className={styles.buttonDiv}>
+                        <div className={styles.dialogContainer}>
+                            <h1 className={styles.dialogTitle}>{dialog.dialogTitle}</h1>
+                            <h2 className={styles.dialogMessage}>{dialog.dialogMessage}</h2>
+                            <div className={styles.divActions}>
                                 {dialog.type === "confirm" && (
-                                    <button className={styles.button_cancel} onClick={() => closeDialog()}>{dialog.dialogSecondaryButtonText}</button>
+                                    <button className={styles.buttonSecondary} onClick={() => closeDialog()}>{dialog.dialogSecondaryButtonText}</button>
                                 )}
-                                <button className={styles.button} onClick={() => {
+                                <button className={styles.buttonPrimary} onClick={() => {
                                     if (dialog.onConfirm) dialog.onConfirm();
                                     closeDialog();
                                 }}>{dialog.dialogPrimaryButtonText}</button>
