@@ -1,13 +1,15 @@
 import styles from '../css/PageAdminDashboard.module.css'
-import { IoChevronBackOutline, IoReload, IoSaveOutline, IoTrashOutline } from "react-icons/io5";
+import { IoChevronBackOutline, IoReload, IoSaveOutline, IoTrashOutline, IoAdd } from "react-icons/io5";
 
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import { useAuth } from '../services/AuthContext';
 import { useNotification } from '../components/Notification';
 import { useDialog } from '../services/DialogContext';
+import DialogAddBook from '../components/DialogAddBook';
 
 export default function AdminDashboard() {
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedTable, setSelectedTable] = useState("books");
     const [tableData, setTableData] = useState({});
 
@@ -154,6 +156,9 @@ export default function AdminDashboard() {
                     <div className={styles.tableHeader}>
                         <h1 className={styles.sectionTitle}>{selectedTable}</h1>
                         <div className={styles.tableHeaderActions}>
+                            {selectedTable === "books" && (<button className={styles.actionButton} onClick={() => {setIsDialogOpen(true);}}>
+                                <IoAdd className={styles.iconClose} />
+                            </button>)}
                             <button className={styles.actionButton} onClick={() => {fetchData(selectedTable); showNotification("Loading...");}}>
                                 <IoReload className={styles.iconClose} />
                             </button>
@@ -206,6 +211,7 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             </div>
+            <DialogAddBook isOpen={isDialogOpen} onClose={() => setIsDialogOpen(false)} />
         </div>
     );
 }
