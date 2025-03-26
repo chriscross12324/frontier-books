@@ -1,0 +1,120 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.dialog {
+    display: flex;
+    flex-direction: row;
+    max-height: 443px;
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    position: relative;
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(20px);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, 0.25);
+}
+
+.divActions {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.button {
+    height: 40px;
+    width: 50%;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+}
+
+.button:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.iconClose {
+    font-size: 22px;
+    width: 100%;
+}
+
+.imageCover {
+    width: 367px;
+    min-width: 275px;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 20px;
+}
+
+.containerDetails {
+    overflow-y: auto;
+}
+
+.textTitle {
+    color: white;
+    font-weight: bold;
+    text-align: start;
+    margin-right: 40px;
+    line-height: 1.2;
+    margin-bottom: 10px;
+}
+
+.textAuthor {
+    color: rgba(255, 255, 255, 0.75);
+    text-align: start;
+}
+
+.textPrice {
+    color: rgba(255, 255, 255, 0.75);
+    text-align: start;
+    margin-bottom: 10px;
+}
+
+.textDescription {
+    color: rgba(255, 255, 255, 0.75);
+    text-align: start;
+}
+
+input {
+    height: 40px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.493);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 15px;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+textarea {
+    min-height: 100px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 100%;
+    background-color: rgba(0, 0, 0, 0.493);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 15px;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
