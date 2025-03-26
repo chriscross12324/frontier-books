@@ -188,6 +188,25 @@ def authenticate_password(plaintext_password: str, hashed_password: str) -> bool
 def hash_password(plaintext_password: str) -> str:
     return pwd_context.hash(plaintext_password)
 
+# --- Verify the User is an Admin ---
+async def verify_admin(authorization: str = Header(None)):
+    # Check if Authorization Header is present and correctly formated
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=404, detail="Invalid or missing access token")
+    
+    # Extract access token
+    access_token = authorization.split("Bearer ")[1]
+    user = decode_access_token(access_token)
+
+    # Confirm user is admin
+    if not user['user_role'] == 'admin':
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized"
+        )
+    
+    return user
+
 
 # ========================================
 # API Endpoints
@@ -334,18 +353,11 @@ async def login_user(login_data: General_User, db=Depends(lease_db_connection)):
         )
 
 # --- Add a New Book to the Store ---
-@app.post("/books")
-async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_connection)):
+@app.post("/create/book")
+async def add_book(book_data: Post_Book, user=Depends(verify_admin), db=Depends(lease_db_connection)):
     try:
-        user = decode_access_token(access_token)
-        if not user['user_role'] == 'admin':
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Error Adding Book: Unauthorized"
-            )
-
         async with db.transaction():
-            result = await db.execute(
+            result = await db.fetchval(
                 "INSERT INTO books (title, author, description, price, cover_image_url, created_at) "
                 "VALUES ($1, $2, $3, $4, $5, $6) RETURNING book_id",
                 book_data.book_title, book_data.book_author, book_data.book_description,
@@ -353,7 +365,7 @@ async def add_book(book_data: Post_Book, access_token: str, db=Depends(lease_db_
             )
 
         # Retrieve book id from result
-        book_id = result[0]['book_id']
+        book_id = result
 
         # Return success message and book id
         return {
@@ -620,25 +632,6 @@ async def get_reviews(book_id: int, db=Depends(lease_db_connection)):
 # ========================================
 # API Endpoints - Admin Only
 # ========================================
-
-# --- Verify the User is an Admin ---
-async def verify_admin(authorization: str = Header(None)):
-    # Check if Authorization Header is present and correctly formated
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=404, detail="Invalid or missing access token")
-    
-    # Extract access token
-    access_token = authorization.split("Bearer ")[1]
-    user = decode_access_token(access_token)
-
-    # Confirm user is admin
-    if not user['user_role'] == 'admin':
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized"
-        )
-    
-    return user
 
 # --- Modify Existing Entry ---
 @app.put("/modify/{entity}/{entity_id}")
