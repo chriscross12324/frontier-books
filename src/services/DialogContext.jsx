@@ -9,8 +9,8 @@ export const DialogProvider = ({ children }) => {
     const [dialog, setDialog] = useState(null);
 
     // --- Spawn an Alert Dialog ---
-    const openDialogAlert = ({ dialogTitle, dialogMessage, dialogButtonText = "OK", onConfirm }) => {
-        setDialog({ type: "alert", dialogTitle, dialogMessage, dialogButtonText, onConfirm });
+    const openDialogAlert = ({ dialogTitle, dialogMessage, dialogPrimaryButtonText = "OK", onConfirm }) => {
+        setDialog({ type: "alert", dialogTitle, dialogMessage, dialogPrimaryButtonText, onConfirm });
     };
 
     // --- Spawn a Confirm Dialog ---
