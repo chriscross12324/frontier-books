@@ -75,3 +75,53 @@
     border-bottom-right-radius: 20px;
     padding: 20px;
 }
+
+.sectionTitle {
+    font-size: 22px;
+    color: rgb(255, 255, 255);
+    text-align: start;
+    margin-bottom: 10px;
+}
+
+.methodLayout {
+    height: 60px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.optionSelected {
+    height: 100%;
+    width: 50%;
+    background: rgb(255, 255, 255);
+    padding: 2px;
+    border-radius: 12px;
+}
+
+.optionUnselected {
+    height: 100%;
+    width: 50%;
+    background: rgba(255, 255, 255, 0);
+    padding: 2px;
+    border-radius: 12px;
+}
+
+.methodButton {
+    height: 100%;
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    background-color: rgb(108, 108, 108);
+    cursor: pointer;
+}
+
+.creditCardDiv {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
+.input {
+    margin-top: 0px;
+}

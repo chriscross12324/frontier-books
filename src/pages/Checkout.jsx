@@ -2,12 +2,13 @@ import styles from '../css/PageCheckout.module.css'
 import { IoChevronBackOutline } from "react-icons/io5";
 import CheckoutItem from "../components/CheckoutItem";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import { CartContext } from "../services/CartContext";
 
 export default function Checkout() {
     const { cart } = useContext(CartContext);
+    const [paymentMethod, setPaymentMethod] = useState("credit");
 
     const navigate = useNavigate();
 
@@ -36,12 +37,36 @@ export default function Checkout() {
                     )}
                 </div>
                 <div className={styles.paymentLayout}>
-                    <h1>Card Details</h1>
-                    <input type='name' placeholder='Cardholder Name'></input>
-                    <input type='number' placeholder='Credit Card Number'></input>
-                    <input type='month' ></input>
-                    <input type='number' placeholder='CSV' maxLength={3}></input>
+                    <h1 className={styles.sectionTitle}>Payment Method</h1>
+                    <div className={styles.methodLayout}>
+                        <div className={`${styles.optionSelected} ${paymentMethod === "credit" ? styles.selected: styles.optionUnselected}`}>
+                            <button className={styles.methodButton} onClick={() => setPaymentMethod("credit")}>Credit Card</button>
+                        </div>
+                        <div className={`${styles.optionSelected} ${paymentMethod === "gift" ? styles.selected: styles.optionUnselected}`}>
+                            <button className={styles.methodButton} onClick={() => setPaymentMethod("gift")}>Gift Card</button>
+                        </div>
+                        
+                    </div>
+                    {paymentMethod === "credit" ? (
+                        <div className={styles.paymentInfoLayout}>
+                            <h1 className={styles.sectionTitle}>Card Details</h1>
+                            <input className={styles.input} type='name' placeholder='Cardholder Name'></input>
+                            <input className={styles.input} type='number' placeholder='Credit Card Number' pattern='[0-9\s]{13,19}' maxLength='19'></input>
+                            <div className={styles.creditCardDiv}>
+                                <input className={styles.input} type='month' placeholder='mm / yy'></input>
+                                <input className={styles.input} type='number' placeholder='CVV' maxLength={3}></input>
+                            </div>
+                            
+                        </div>
+                    ) : (
+                        <div className={styles.paymentInfoLayout}>
+                            <h1 className={styles.sectionTitle}>Card Details</h1>
+                            <input className={styles.input} type='number' placeholder='Gift Card Number'></input>
+                        </div>
+                    )}
                 </div>
+                
+                
             </div>
         </div>
     );
