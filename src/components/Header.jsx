@@ -89,7 +89,7 @@ const Header = ({ books, setFilteredBooks }) => {
                     </div>
 
                     {isUserAdmin && (<Link to="/admin" className={styles.sign_in}>Admin Dashboard</Link>)}
-                    <Link to="/user" className={styles.sign_in} >Sign Out</Link>
+                    <Link to="/user" className={styles.sign_in}>Account</Link>
                 </div>
             ) : (
                 <Link to="/login">Sign In</Link>
