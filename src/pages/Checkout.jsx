@@ -6,9 +6,12 @@ import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import { CartContext } from "../services/CartContext";
 import { useAuth } from '../services/AuthContext';
+import { useNotification } from '../components/Notification';
+import { useDialog } from '../services/DialogContext';
 
 export default function Checkout() {
     const { cart } = useContext(CartContext);
+    const { openDialogAlert } = useDialog();
     const { getValidAccessToken } = useAuth();
     const [paymentMethod, setPaymentMethod] = useState("credit");
     const [paymentDetails, setPaymentDetails] = useState({});
@@ -40,7 +43,22 @@ export default function Checkout() {
                 order_delivery_address: JSON.stringify(deliveryDetails)
              })
             });
-            console.log(response);
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log(data);
+
+                openDialogAlert({ 
+                    dialogTitle: "Transaction Complete!",
+                    dialogMessage: `We'll ship your order shortly. Here is your Order ID for reference: ${data['message']}`, 
+                    onConfirm: () => {navigate("/");}
+                });
+            } else {
+                openDialogAlert({ 
+                    dialogTitle: "Transaction Failed",
+                    dialogMessage: "An error occured while processing your order.", 
+                });
+            }
         } catch (err) {
             console.error("Checkout Error: ", err);
         }
