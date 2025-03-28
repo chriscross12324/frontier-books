@@ -635,15 +635,44 @@ async def checkout(order_data: Post_Order, authorization: str = Header(None), db
             detail=f"Error Getting Cart: {str(e)}"
         )
 
-@app.get("/orders/{user_id}")
-async def get_orders(user_id: int, db=Depends(lease_db_connection)):
+@app.get("/user_orders")
+async def get_user_orders(authorization: str = Header(None), db=Depends(lease_db_connection)):
     try:
-        orders = await db.fetch("SELECT * FROM orders WHERE user_id = $1", user_id)
+        # Check if Authorization Header is present and correctly formated
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=404, detail="Invalid or missing access token")
+
+        #Extract access token
+        access_token = authorization.split("Bearer ")[1]
+
+        # Get requesting user's id
+        user = decode_access_token(access_token)
+        user_id = user['user_id']
+
+        orders = await db.fetch("SELECT *, order_items.book_id, order_items.quantity FROM orders JOIN order_items on orders.order_id = order_items.order_id WHERE orders.user_id = $1", user_id)
+
+        grouped_orders = {}
+        for order in orders:
+            order_id = order['order_id']
+
+            if order_id not in grouped_orders:
+                grouped_orders[order_id] = {
+                    'order_id': order['order_id'],
+                    'user_id': order['user_id'],
+                    'total_amount': order['total_amount'],
+                    'delivery_address': order['delivery_address'],
+                    'payment_info': order['payment_info'],
+                    'order_status': order['order_status'],
+                    'created_at': order['created_at'],
+                    'items': [],
+                }
+            order_item_string = f"{order['book_id']}:{order['quantity']}"
+            grouped_orders[order_id]['items'].append(order_item_string)
     except Exception as e:
         print(f"Failed: {str(e)}")
     if not orders:
         raise HTTPException(status_code=404, detail="No orders found for this user")
-    return {"orders": orders}
+    return {"orders": list(grouped_orders.values())}
 
 @app.get("/orders")
 async def get_orders(user=Depends(verify_admin), db=Depends(lease_db_connection)):
@@ -671,7 +700,7 @@ async def get_orders(user=Depends(verify_admin), db=Depends(lease_db_connection)
         print(f"Failed: {str(e)}")
     if not orders:
         raise HTTPException(status_code=404, detail="No orders found for this user")
-    return {"orders": grouped_orders}
+    return {"orders": list(grouped_orders.values())}
 
 
 ## Review Endpoints
