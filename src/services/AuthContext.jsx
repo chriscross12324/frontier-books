@@ -32,6 +32,7 @@ export function AuthProvider({ children }) {
                 setIsAuthenticated(false);
                 setIsUserAdmin(false);
                 showNotification("Signed Out");
+                navigate("/");
             }
         });
     };
