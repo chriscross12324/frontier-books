@@ -619,12 +619,6 @@ async def checkout(order_data: Post_Order, authorization: str = Header(None), db
             await db.execute("DELETE FROM cart_items WHERE user_id = $1", user_id)
 
         return {"message": f"Order Placed Successfully: {order_id}"}
-        await db.execute(
-            "INSERT INTO orders (user_id, total_amount, order_status, created_at) VALUES ($1, $2, 'Completed', $3)",
-            order.user_id, order.total_amount, datetime.now(timezone.utc)
-        )
-        await db.execute("DELETE FROM cart_items WHERE user_id = $1", order.user_id)
-        return {"message": "Order placed successfully"}
     
     except HTTPException as e:
         raise e
@@ -654,12 +648,30 @@ async def get_orders(user_id: int, db=Depends(lease_db_connection)):
 @app.get("/orders")
 async def get_orders(user=Depends(verify_admin), db=Depends(lease_db_connection)):
     try:
-        orders = await db.fetch("SELECT * FROM orders")
+        orders = await db.fetch("SELECT *, order_items.book_id, order_items.quantity FROM orders JOIN order_items on orders.order_id = order_items.order_id")
+
+        grouped_orders = {}
+        for order in orders:
+            order_id = order['order_id']
+
+            if order_id not in grouped_orders:
+                grouped_orders[order_id] = {
+                    'order_id': order['order_id'],
+                    'user_id': order['user_id'],
+                    'total_amount': order['total_amount'],
+                    'delivery_address': order['delivery_address'],
+                    'payment_info': order['payment_info'],
+                    'order_status': order['order_status'],
+                    'created_at': order['created_at'],
+                    'items': [],
+                }
+            order_item_string = f"{order['book_id']}:{order['quantity']}"
+            grouped_orders[order_id]['items'].append(order_item_string)
     except Exception as e:
         print(f"Failed: {str(e)}")
     if not orders:
         raise HTTPException(status_code=404, detail="No orders found for this user")
-    return {"orders": orders}
+    return {"orders": grouped_orders}
 
 
 ## Review Endpoints
