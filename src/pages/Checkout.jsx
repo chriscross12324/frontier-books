@@ -5,12 +5,63 @@ import CheckoutItem from "../components/CheckoutItem";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router";
 import { CartContext } from "../services/CartContext";
+import { useAuth } from '../services/AuthContext';
 
 export default function Checkout() {
     const { cart } = useContext(CartContext);
+    const { getValidAccessToken } = useAuth();
     const [paymentMethod, setPaymentMethod] = useState("credit");
+    const [paymentDetails, setPaymentDetails] = useState({});
+    const [deliveryDetails, setDeliveryDetails]  = useState({});
 
     const navigate = useNavigate();
+
+    const handleCheckout = async () => {
+        console.log(cart.map(book => ({
+            book_id: book.book_id,
+            book_quantity: book.quantity
+        })));
+        
+        //return;
+        try {
+            const response = await fetch('https://findthefrontier.ca/frontier_books/checkout', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getValidAccessToken()}`
+                },
+                body: JSON.stringify({ order_items: cart.map(book => ({
+                    book_id: book.book_id,
+                    book_quantity: book.quantity
+                })),
+                order_total_cost: (cart.reduce((sum, item) => sum + item.quantity * item.price, 0)).toFixed(2),
+                order_payment_method: paymentMethod,
+                order_payment_details: JSON.stringify(paymentDetails),
+                order_delivery_address: JSON.stringify(deliveryDetails)
+             })
+            });
+            console.log(response);
+        } catch (err) {
+            console.error("Checkout Error: ", err);
+        }
+    };
+
+    const handlePaymentInputChange = (e) => {
+        const { name, value } = e.target;
+        setPaymentDetails((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+        console.log(paymentDetails);
+    };
+
+    const handleDeliveryInputChange = (e) => {
+        const { name, value } = e.target;
+        setDeliveryDetails((prevData) => ({
+            ...prevData,
+            [name]: value
+        }));
+    }
 
     return (
         <div className={styles.pageRootLayout}>
@@ -40,39 +91,39 @@ export default function Checkout() {
                     <h1 className={styles.sectionTitle}>Payment Method</h1>
                     <div className={styles.methodLayout}>
                         <div className={`${styles.optionSelected} ${paymentMethod === "credit" ? styles.selected: styles.optionUnselected}`}>
-                            <button className={styles.methodButton} onClick={() => setPaymentMethod("credit")}>Credit Card</button>
+                            <button className={styles.methodButton} onClick={() => {setPaymentMethod("credit"); setPaymentDetails({})}}>Credit Card</button>
                         </div>
                         <div className={`${styles.optionSelected} ${paymentMethod === "gift" ? styles.selected: styles.optionUnselected}`}>
-                            <button className={styles.methodButton} onClick={() => setPaymentMethod("gift")}>Gift Card</button>
+                            <button className={styles.methodButton} onClick={() => {setPaymentMethod("gift"); setPaymentDetails({})}}>Gift Card</button>
                         </div>
                         
                     </div>
                     <h1 className={styles.sectionTitle}>Card Details</h1>
                     {paymentMethod === "credit" ? (
                         <div className={styles.infoLayout}>
-                            <input className={styles.input} type='name' placeholder='Cardholder Name'></input>
-                            <input className={styles.input} type='number' placeholder='Credit Card Number' pattern='[0-9\s]{13,19}' maxLength='19'></input>
+                            <input className={styles.input} name='cardHolder' type='name' placeholder='Cardholder Name' onChange={handlePaymentInputChange}></input>
+                            <input className={styles.input} name='cardNumber' type='number' placeholder='Credit Card Number' pattern='[0-9\s]{13,19}' maxLength='19' onChange={handlePaymentInputChange}></input>
                             <div className={styles.rowDiv}>
-                                <input className={styles.input} type='month' placeholder='MM/YYYY'></input>
-                                <input className={styles.input} type='number' placeholder='CVV' maxLength={3}></input>
+                                <input className={styles.input} name='cardExp' type='month' placeholder='MM/YYYY' onChange={handlePaymentInputChange}></input>
+                                <input className={styles.input} name='cardCVV' type='number' placeholder='CVV' maxLength={3} onChange={handlePaymentInputChange}></input>
                             </div>
                             
                         </div>
                     ) : (
                         <div className={styles.infoLayout}>
-                            <input className={styles.input} type='number' placeholder='Gift Card Number'></input>
+                            <input className={styles.input} name='cardCode' type='text' placeholder='Gift Card Number' onChange={handlePaymentInputChange}></input>
                         </div>
                     )}
                     <h1 className={styles.sectionTitle}>Delivery Instructions</h1>
                     <div className={styles.infoLayout}>
-                        <input className={styles.input} type='text' placeholder='Street Address'></input>
-                        <input className={styles.input} type='text' placeholder='City'></input>
+                        <input className={styles.input} name='address_street' type='text' placeholder='Street Address' onChange={handleDeliveryInputChange}></input>
+                        <input className={styles.input} name='address_city' type='text' placeholder='City' onChange={handleDeliveryInputChange}></input>
                         <div className={styles.rowDiv}>
-                            <input className={styles.input} type='text' placeholder='Province'></input>
-                            <input className={styles.input} type='text' placeholder='Postal Code' pattern='^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$'></input>
+                            <input className={styles.input} name='address_province' type='text' placeholder='Province' onChange={handleDeliveryInputChange}></input>
+                            <input className={styles.input} name='address_postal_code' type='text' placeholder='Postal Code' pattern='^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$' onChange={handleDeliveryInputChange}></input>
                         </div>
                     </div>
-                    <button className={styles.buttonCheckout}>Place Order</button>
+                    <button className={styles.buttonCheckout} onClick={handleCheckout}>Place Order</button>
                 </div>
                 
                 
