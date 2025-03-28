@@ -14,12 +14,11 @@ export default function UserDashboard() {
 
     const { showNotification } = useNotification();
     const { openDialogConfirm } = useDialog();
-    const { getValidAccessToken } = useAuth();
+    const { getValidAccessToken, logout } = useAuth();
 
     const tableColumnHeaders = {
         "orders": [
             { name: "Order ID", editable: false },
-            { name: "User ID", editable: false },
             { name: "Items", editable: false },
             { name: "Total Amount", editable: false },
             { name: "Delivery Address", editable: true },
@@ -77,6 +76,7 @@ export default function UserDashboard() {
                         {Object.keys(tableColumnHeaders).map(key => (
                             <li key={key}><button className={styles.buttonNavigation} onClick={() => {setSelectedTable(key)}}>{key.charAt(0).toUpperCase() + key.slice(1)}</button></li>
                         ))}
+                        <li key='sign-out'><button className={styles.buttonNavigation} onClick={() => {logout();}}>Sign Out</button></li>
                     </ul>
                 </div>
                 <div className={styles.tableLayout}>
