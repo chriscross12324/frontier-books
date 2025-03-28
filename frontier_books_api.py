@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Depends, Request, status, Form, Head
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+import json
 from passlib.context import CryptContext
 from pydantic import BaseModel, Field
 import random
@@ -131,6 +132,9 @@ class Post_Cart(BaseModel):
 class Post_Order(BaseModel):
     order_items: List[General_CartItem]
     order_total_cost: float
+    order_payment_method: str
+    order_payment_details: str
+    order_delivery_address: str
 
 class Review(BaseModel):
     review_book_id: int
@@ -260,23 +264,8 @@ async def create_user(user_data: General_User, db=Depends(lease_db_connection)):
     
 # --- Get all User Accounts ---
 @app.get("/users")
-async def get_all_users(authorization: str = Header(None), db=Depends(lease_db_connection)):
+async def get_all_users(user=Depends(verify_admin), db=Depends(lease_db_connection)):
     try:
-        # Check if Authorization Header is present and correctly formated
-        if not authorization or not authorization.startswith("Bearer "):
-            raise HTTPException(status_code=404, detail="Invalid or missing access token")
-        
-        #Extract access token
-        access_token = authorization.split("Bearer ")[1]
-
-        # Get requesting user's role
-        user = decode_access_token(access_token)
-        if not user['user_role'] == 'admin':
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Error Getting Users: Unauthorized"
-            )
-        
         all_users = await db.fetch("SELECT user_id, username, email, role from users ORDER BY user_id ASC")
         return {
             "status_code": status.HTTP_200_OK,
@@ -578,15 +567,79 @@ async def get_cart(authorization: str = Header(None), db=Depends(lease_db_connec
         )
 
 ## Checkout Endpoints
-@app.post("/checkout/")
-async def checkout(order: Post_Order, db=Depends(lease_db_connection)):
-    total_amount = sum()
-    await db.execute(
-        "INSERT INTO orders (user_id, total_amount, order_status, created_at) VALUES ($1, $2, 'Completed', $3)",
-        order.user_id, order.total_amount, datetime.now(timezone.utc)
-    )
-    await db.execute("DELETE FROM cart_items WHERE user_id = $1", order.user_id)
-    return {"message": "Order placed successfully"}
+@app.post("/checkout")
+async def checkout(order_data: Post_Order, authorization: str = Header(None), db=Depends(lease_db_connection)):
+    try:
+        # Check if Authorization Header is present and correctly formated
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(status_code=404, detail="Invalid or missing access token")
+
+        #Extract access token
+        access_token = authorization.split("Bearer ")[1]
+
+        # Get requesting user's id
+        user = decode_access_token(access_token)
+        user_id = user['user_id']
+
+        delivery_address = json.loads(order_data.order_delivery_address)
+        payment_info = json.loads(order_data.order_payment_details)
+
+        if order_data.order_payment_method == "gift":
+            response = await db.fetchrow("SELECT balance FROM gift_cards WHERE giftcard_code = $1", payment_info.get('cardCode'))
+            if response is None:
+                raise HTTPException(
+                    status_code=404,
+                    detail="Invalid Giftcard Code"
+                )
+
+            if response['balance'] <= order_data.order_total_cost:
+                raise HTTPException(
+                    status_code=402,
+                    detail="Insufficient Funds"
+                )
+            
+        formatted_address = ", ".join(delivery_address.values())
+        formatted_payment = ", ".join(payment_info.values())
+        print(formatted_address)
+        print(formatted_payment)
+
+        async with db.transaction():
+            order_id = await db.fetchval("INSERT INTO orders (user_id, total_amount, order_status, created_at, delivery_address, payment_info) VALUES ($1, $2, 'Pending', $3, $4, $5) RETURNING order_id",
+                user_id, order_data.order_total_cost, datetime.now(timezone.utc), formatted_address, formatted_payment) 
+            
+            for item in order_data.order_items:
+                await db.execute(
+                    """
+                    INSERT INTO order_items (order_id, book_id, quantity, unit_price)
+                    VALUES ($1, $2, $3, $4)
+                    """,
+                    order_id, item.book_id, item.book_quantity, 0.00
+                )
+            
+            await db.execute("DELETE FROM cart_items WHERE user_id = $1", user_id)
+
+        return {"message": f"Order Placed Successfully: {order_id}"}
+        await db.execute(
+            "INSERT INTO orders (user_id, total_amount, order_status, created_at) VALUES ($1, $2, 'Completed', $3)",
+            order.user_id, order.total_amount, datetime.now(timezone.utc)
+        )
+        await db.execute("DELETE FROM cart_items WHERE user_id = $1", order.user_id)
+        return {"message": "Order placed successfully"}
+    
+    except HTTPException as e:
+        raise e
+
+    except asyncpg.PostgresError as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Cart: Database Error ({str(e)})"
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error Getting Cart: {str(e)}"
+        )
 
 @app.get("/orders/{user_id}")
 async def get_orders(user_id: int, db=Depends(lease_db_connection)):
@@ -599,7 +652,7 @@ async def get_orders(user_id: int, db=Depends(lease_db_connection)):
     return {"orders": orders}
 
 @app.get("/orders")
-async def get_orders(db=Depends(lease_db_connection)):
+async def get_orders(user=Depends(verify_admin), db=Depends(lease_db_connection)):
     try:
         orders = await db.fetch("SELECT * FROM orders")
     except Exception as e:
