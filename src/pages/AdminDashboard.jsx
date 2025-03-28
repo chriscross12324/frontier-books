@@ -36,8 +36,11 @@ export default function AdminDashboard() {
             { name: "Order ID", editable: false },
             { name: "User ID", editable: false },
             { name: "Items", editable: false },
-            { name: "Cost", editable: false },
-            { name: "Status", editable: true }
+            { name: "Total Amount", editable: false },
+            { name: "Delivery Address", editable: true },
+            { name: "Payment Info", editable: false },
+            { name: "Order Status", editable: true },
+            { name: "Created At", editable: false }
         ],
     };
 
@@ -175,7 +178,7 @@ export default function AdminDashboard() {
                             </thead>
                             <tbody>
                                 {tableData[selectedTable] ? tableData[selectedTable].map((row, rowIndex) => (
-                                    <tr key={row.user_id}>
+                                    <tr key={rowIndex}>
                                         {tableColumnHeaders[selectedTable].map((col, colIndex) => (
                                             <td key={colIndex}>
                                                 <input 
