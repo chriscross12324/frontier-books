@@ -74,6 +74,7 @@
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
     padding: 20px;
+    overflow-y: auto;
 }
 
 .sectionTitle {
@@ -116,7 +117,11 @@
     cursor: pointer;
 }
 
-.creditCardDiv {
+.infoLayout {
+    margin-bottom: 15px;
+}
+
+.rowDiv {
     display: flex;
     flex-direction: row;
     gap: 5px;
@@ -124,4 +129,21 @@
 
 .input {
     margin-top: 0px;
+}
+
+.buttonCheckout {
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    color: white;
+    height: 40px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.buttonCheckout:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 255, 255, 0.025);
 }

@@ -47,23 +47,32 @@ export default function Checkout() {
                         </div>
                         
                     </div>
+                    <h1 className={styles.sectionTitle}>Card Details</h1>
                     {paymentMethod === "credit" ? (
-                        <div className={styles.paymentInfoLayout}>
-                            <h1 className={styles.sectionTitle}>Card Details</h1>
+                        <div className={styles.infoLayout}>
                             <input className={styles.input} type='name' placeholder='Cardholder Name'></input>
                             <input className={styles.input} type='number' placeholder='Credit Card Number' pattern='[0-9\s]{13,19}' maxLength='19'></input>
-                            <div className={styles.creditCardDiv}>
-                                <input className={styles.input} type='month' placeholder='mm / yy'></input>
+                            <div className={styles.rowDiv}>
+                                <input className={styles.input} type='month' placeholder='MM/YYYY'></input>
                                 <input className={styles.input} type='number' placeholder='CVV' maxLength={3}></input>
                             </div>
                             
                         </div>
                     ) : (
-                        <div className={styles.paymentInfoLayout}>
-                            <h1 className={styles.sectionTitle}>Card Details</h1>
+                        <div className={styles.infoLayout}>
                             <input className={styles.input} type='number' placeholder='Gift Card Number'></input>
                         </div>
                     )}
+                    <h1 className={styles.sectionTitle}>Delivery Instructions</h1>
+                    <div className={styles.infoLayout}>
+                        <input className={styles.input} type='text' placeholder='Street Address'></input>
+                        <input className={styles.input} type='text' placeholder='City'></input>
+                        <div className={styles.rowDiv}>
+                            <input className={styles.input} type='text' placeholder='Province'></input>
+                            <input className={styles.input} type='text' placeholder='Postal Code' pattern='^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$'></input>
+                        </div>
+                    </div>
+                    <button className={styles.buttonCheckout}>Place Order</button>
                 </div>
                 
                 
