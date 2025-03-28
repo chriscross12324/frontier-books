@@ -52,7 +52,7 @@ const Header = ({ books, setFilteredBooks }) => {
                 </nav>
             </div>
 
-            <input className={styles.searchInput} type="text" placeholder="Search..." onChange={(e) => setSearchTerm(e.target.value)}/>
+            <input className={styles.searchInput} type="search" placeholder="Search..." onChange={(e) => setSearchTerm(e.target.value)}/>
 
             {isAuthenticated ? (
                 <div className={styles.headerRight}>
