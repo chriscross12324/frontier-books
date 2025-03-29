@@ -156,6 +156,18 @@
     margin-top: 0px;
 }
 
+.select {
+    height: 40px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.493);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 15px;
+    padding: 10px;
+    margin-top: 0px;
+    margin-bottom: 5px;
+}
+
 .buttonCheckout {
     width: 100%;
     background-color: rgba(255, 255, 255, 0.25);
