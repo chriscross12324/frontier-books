@@ -13,14 +13,38 @@ const Header = ({ books, setFilteredBooks }) => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const [fitleredBooksForSuggestions, setFitleredBooksForSuggestions] = useState([]);
 
+    const suggestionsDropdownRef = useRef(null);
     const toggleCart = () => setIsCartOpen(!isCartOpen);
-
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (suggestionsDropdownRef.current && !suggestionsDropdownRef.current.contains(event.target)) {
+                setFitleredBooksForSuggestions([]);
+            }
+        };
+
+        const handleEscapeKey = (event) => {
+            if (event.key === 'Escape') {
+                setFitleredBooksForSuggestions([]);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('keydown', handleEscapeKey);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, []);
 
     useEffect(() => {
         if (searchTerm === "") {
             setFilteredBooks(books);
+            setFitleredBooksForSuggestions([]);
         } else {
             const lowerCaseSearch = searchTerm.toLowerCase();
             const priceExactMatch = lowerCaseSearch.match(/^\$(\d+\.?\d*)$/);
@@ -39,6 +63,7 @@ const Header = ({ books, setFilteredBooks }) => {
             );
 
             setFilteredBooks(filteredBooks);
+            setFitleredBooksForSuggestions(filteredBooks.slice(0, 5));
         }
     }, [searchTerm, books]);
 
@@ -52,7 +77,16 @@ const Header = ({ books, setFilteredBooks }) => {
                 </nav>
             </div>
 
-            <input className={styles.searchInput} type="search" placeholder="Search..." onChange={(e) => setSearchTerm(e.target.value)}/>
+            <div className={styles.searchContainer}>
+                <input className={styles.searchInput} type="search" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}/>
+                {searchTerm && fitleredBooksForSuggestions.length > 0 && (
+                    <div ref={suggestionsDropdownRef} className={styles.suggestionsDropdown}>
+                        {fitleredBooksForSuggestions.map(book => (
+                            <div key={book.book_id} className={styles.suggestionItem} onClick={() => {setSearchTerm(book.title); setFilteredBooks([book]);}}>{book.title}</div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
             {isAuthenticated ? (
                 <div className={styles.headerRight}>
