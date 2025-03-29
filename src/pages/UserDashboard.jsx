@@ -1,4 +1,4 @@
-import styles from '../css/PageAdminDashboard.module.css'
+import styles from '../css/PageUserDashboard.module.css'
 import { IoChevronBackOutline, IoReload, IoSaveOutline, IoTrashOutline, IoAdd } from "react-icons/io5";
 
 import { useEffect, useState } from "react";
@@ -100,39 +100,40 @@ export default function UserDashboard() {
                             <tbody>
                                 {tableData[selectedTable] ? tableData[selectedTable].map((row, rowIndex) => (
                                     <tr key={rowIndex}>
-                                        {tableColumnHeaders[selectedTable].map((col, colIndex) => (
-                                            <td key={colIndex}>
-                                                <input 
-                                                    className={styles.tableInput}
-                                                    type="text"
-                                                    value={row[col.name.toLowerCase().replace(/\s+/g, "_")] || ""}
-                                                    disabled={!col.editable}
-                                                    onChange={(e) => handleInputChange(rowIndex, col.name.toLowerCase().replace(/\s+/g, "_"), e.target.value)}
-                                                />
-                                            </td>
-                                        ))}
-                                        <td className={styles.rowActions}>
-                                            <button className={styles.actionButton} onClick={() => {
-                                                showNotification("Saving...");
-                                                handleSave(row);
-                                                console.debug(row);
-                                            }}><IoSaveOutline className={styles.iconClose} /></button>
-                                            <button className={styles.actionButton} onClick={() => {
-                                                openDialogConfirm({
-                                                    dialogTitle: "Permanently Delete Entry?", 
-                                                    dialogMessage: "This action cannot be undone. Are you sure you want to delete this entry?", 
-                                                    onConfirm: () => {
-                                                        showNotification("Deleting...");
-                                                        handleDelete(row);
-                                                    }
+                                        {tableColumnHeaders[selectedTable].map((col, colIndex) => {
+                                            const key = col.name.toLowerCase().replace(/\s+/g, "_");
+                                            let displayValue = row[key] || "";
+
+                                            if (key === "created_at" && displayValue) {
+                                                displayValue = new Date(displayValue).toLocaleString("en-us", {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit',
+                                                    second: '2-digit',
+                                                    hour12: false,
                                                 });
-                                            }}><IoTrashOutline className={styles.iconClose} /></button>
-                                        </td>
+                                            }
+
+                                            return (
+                                                <td key={colIndex}>
+                                                    <input 
+                                                        className={styles.tableInput}
+                                                        type="text"
+                                                        value={displayValue}
+                                                        disabled={!col.editable}
+                                                        readOnly
+                                                    />
+                                                </td>
+                                            );
+                                        })}
                                     </tr>
                                 )) : (<p>No data available</p>)}
                             </tbody>
                         </table>
                     </div>
+                    
                 </div>
             </div>
         </div>

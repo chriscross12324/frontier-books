@@ -6,7 +6,7 @@ export default function CartItem({ cartItem }) {
         <div className={styles.itemCard}>
             <img src={cartItem.cover_image_url} alt={cartItem.title} className={styles.itemImage} />
             <div className={styles.itemFooter}>
-                <div>
+                <div className={styles.divBookInfo}>
                     <h2 className={styles.itemTitle}>
                         {cartItem.title}
                     </h2>

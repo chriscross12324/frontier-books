@@ -7,26 +7,17 @@ const PasswordInput = ({ password, setPassword }) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
-        <div style={{ position: "relative", width: "100%", alignItems: "center" }}>
+        <div className={styles.divPasswordInput}>
             <input className={styles.inputCredential} 
                 type={showPassword ? "text" : "password"} 
                 placeholder='Password' 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)} />
 
-            <button 
+            <button className={styles.buttonTogglePassword}
             type='button'
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-                    height: "100%",
-                    position: "absolute",
-                    right: "15px",
-                    top: "50%",
-                    transform: "translateY(-49%)",
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer"
-                }}>{showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}</button>
+            >{showPassword ? <IoEyeOffOutline size={20} /> : <IoEyeOutline size={20} />}</button>
         </div>
         
     )

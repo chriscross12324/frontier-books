@@ -21,9 +21,10 @@
     flex-direction: row;
 }
 
-.itemsLayout {
+.navigationLayout {
     height: 100%;
     width: 50%;
+    max-width: 200px;
     background-color: rgba(0, 0, 0, 0.75);
     border-top-left-radius: 20px;
     border-bottom-left-radius: 20px;
@@ -34,6 +35,10 @@
     backdrop-filter: blur(20px);
 }
 
+.navigationLayout ul {
+    list-style: none;
+}
+
 .navigationHeader {
     height: 35px;
     display: flex;
@@ -42,22 +47,44 @@
     margin-bottom: 10px;
 }
 
-.buttonClose {
+.actionButton {
     height: 35px;
     width: 35px;
     display: flex;
     align-items: center;
+    border: none;
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 50ms linear;
+}
+
+.actionButton:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.buttonNavigation {
+    height: 35px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    align-content: center;
     top: 10px;
     right: 10px;
     border: none;
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     font-size: 20px;
     cursor: pointer;
-    transition: background-color 0.05s linear;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 14px;
+    padding-left: 10px;
+    transition: background-color 50ms linear;
 }
 
-.buttonClose:hover {
+.buttonNavigation:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 
@@ -82,9 +109,9 @@
     list-style: none;
 }
 
-.paymentLayout {
+.tableLayout {
     height: 100%;
-    width: 50%;
+    width: calc(100% - min(50%, 200px));
     background-color: rgba(0, 0, 0, 0.5);
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
@@ -93,83 +120,87 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 20px;
     backdrop-filter: blur(20px);
-    overflow-y: auto;
 }
 
-.sectionTitle {
-    font-size: 22px;
-    color: rgb(255, 255, 255);
-    text-align: start;
+.tableHeader {
+    height: 35px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 10px;
 }
 
-.methodLayout {
-    height: 60px;
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin-bottom: 20px;
-}
-
-.optionSelected {
-    height: 100%;
-    width: 50%;
-    background: rgb(255, 255, 255, 0);
-    border: 2px solid rgb(255, 255, 255);
-    border-radius: 12px;
-    transition: border 0.075s linear;
-}
-
-.optionUnselected {
-    height: 100%;
-    width: 50%;
-    background: rgba(255, 255, 255, 0);
-    border: 2px solid rgb(255, 255, 255, 0);
-    border-radius: 12px;
-}
-
-.methodButton {
-    height: 100%;
+.editableTableWrapper {
+    height: calc(100% - 40px);
     width: 100%;
-    border: none;
+    overflow: auto;
     border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.15);
-    cursor: pointer;
-    transition: background-color 0.05s linear;
 }
 
-.methodButton:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+.sectionTitle {
+    text-transform: capitalize;
+    font-size: 32px;
+    color: rgb(255, 255, 255);
 }
 
-.infoLayout {
-    margin-bottom: 15px;
-}
-
-.rowDiv {
+.tableHeaderActions {
     display: flex;
     flex-direction: row;
     gap: 5px;
 }
 
-.input {
-    margin-top: 0px;
-}
-
-.buttonCheckout {
+.editableTable {
     width: 100%;
-    background-color: rgba(255, 255, 255, 0.25);
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    color: white;
-    height: 40px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.05s linear;
+    min-width: max-content;
+    border-collapse: collapse;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.buttonCheckout:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    border: 2px solid rgba(255, 255, 255, 0.025);
+.editableTable thead {
+    position: sticky;
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.25);
+}
+
+.editableTable th {
+    background-color: rgba(255, 255, 255, 0.0);
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    white-space: nowrap;
+    border-radius: 10px;
+}
+
+.editableTable td {
+    padding: 2px;
+    border-style: solid;
+    border-width: 2px 1px;
+    border-color: rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.15);
+    border-radius: 10px;
+}
+
+.tableInput {
+    height: 30px;
+    width: 100%;
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    padding: 0 5px
+}
+
+.tableInput:disabled {
+    color: rgb(255, 255, 255);
+    opacity: 0.65 !important;
+    font-weight: bold;
+}
+
+.rowActions {
+    display: flex;
+    flex-direction: row;
+    border-style: solid;
+    border-width: 1px !important;
+    border-color: rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.15);
+    gap: 2px;
 }

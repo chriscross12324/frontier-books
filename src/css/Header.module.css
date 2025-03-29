@@ -140,14 +140,15 @@ a {
     width: 35px;
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    transition: background-color 50ms linear;
 }
 
 .buttonCloseCart:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .iconCloseCart {
@@ -177,6 +178,7 @@ a {
     font-size: 0.8rem;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 50ms linear, border 50ms linear;
 }
 
 .buttonCheckout:hover {

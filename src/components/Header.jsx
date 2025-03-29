@@ -9,7 +9,7 @@ import { Link } from "react-router";
 
 const Header = ({ books, setFilteredBooks }) => {
     const { cart, isCartSaved, saveLocalCart } = useContext(CartContext);
-    const { isAuthenticated, isUserAdmin, logout } = useAuth();
+    const { isAuthenticated, isUserAdmin } = useAuth();
 
     const [searchTerm, setSearchTerm] = useState("");
     const [isCartOpen, setIsCartOpen] = useState(false);
