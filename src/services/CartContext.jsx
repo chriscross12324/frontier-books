@@ -112,7 +112,7 @@ export const CartProvider = ({ children }) => {
     // --- Load Cart from LocalStorage on Mount ---
     useEffect(() => {
         if (isAuthenticated) loadRemoteCart();
-    }, []);
+    }, [isAuthenticated]);
 
     // --- Save Cart to LocalStorage on Change ---
     useEffect(() => {
