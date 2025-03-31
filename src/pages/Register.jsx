@@ -50,7 +50,7 @@ export default function Register() {
         <div className={styles.pageBackground}>
             <div className={styles.pageContainerHolder}>
                 <div className={styles.container}>
-                    <button className={styles.buttonClose} onClick={() => location.href = '/'}>
+                    <button className={styles.buttonClose} onClick={() => navigate("/")}>
                         <IoClose className={styles.iconClose} />
                     </button>
                     <h1 className={styles.pageTitle}>Create Account</h1>
