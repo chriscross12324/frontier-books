@@ -42,6 +42,7 @@
     background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
     backdrop-filter: blur(5px);
+    transition: background-color 0.05s linear;
 }
 
 .buttonClose:hover {

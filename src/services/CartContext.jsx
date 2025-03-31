@@ -112,7 +112,7 @@ export const CartProvider = ({ children }) => {
     // --- Load Cart from LocalStorage on Mount ---
     useEffect(() => {
         if (isAuthenticated) loadRemoteCart();
-    }, []);
+    }, [isAuthenticated]);
 
     // --- Save Cart to LocalStorage on Change ---
     useEffect(() => {
@@ -165,7 +165,7 @@ export const CartProvider = ({ children }) => {
     };
 
     return (
-        <CartContext.Provider value={{ cart, isCartSaved, loadRemoteCart, saveLocalCart, addToCart, updateQuantity, removeItem }}>
+        <CartContext.Provider value={{ cart, isCartSaved, setCart, loadRemoteCart, saveLocalCart, addToCart, updateQuantity, removeItem }}>
             {children}
         </CartContext.Provider>
     );

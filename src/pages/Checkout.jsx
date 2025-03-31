@@ -10,7 +10,7 @@ import { useNotification } from '../components/Notification';
 import { useDialog } from '../services/DialogContext';
 
 export default function Checkout() {
-    const { cart } = useContext(CartContext);
+    const { cart, setCart } = useContext(CartContext);
     const { openDialogAlert } = useDialog();
     const { getValidAccessToken } = useAuth();
     const [paymentMethod, setPaymentMethod] = useState("credit");
@@ -19,7 +19,8 @@ export default function Checkout() {
 
     const navigate = useNavigate();
 
-    const handleCheckout = async () => {
+    const handleCheckout = async (e) => {
+        e.preventDefault();
         console.log(cart.map(book => ({
             book_id: book.book_id,
             book_quantity: book.quantity
@@ -47,6 +48,8 @@ export default function Checkout() {
             if (response.ok) {
                 const data = await response.json();
                 console.log(data);
+                localStorage.removeItem("cart");
+                setCart([]);
 
                 openDialogAlert({ 
                     dialogTitle: "Transaction Complete!",
@@ -54,9 +57,10 @@ export default function Checkout() {
                     onConfirm: () => {navigate("/");}
                 });
             } else {
+                const data = await response.json();
                 openDialogAlert({ 
                     dialogTitle: "Transaction Failed",
-                    dialogMessage: "An error occured while processing your order.", 
+                    dialogMessage: `An error occured while processing your order. [${data['detail']}]`, 
                 });
             }
         } catch (err) {
@@ -79,6 +83,7 @@ export default function Checkout() {
             ...prevData,
             [name]: value
         }));
+        console.log(deliveryDetails);
     }
 
     return (
@@ -106,42 +111,60 @@ export default function Checkout() {
                     )}
                 </div>
                 <div className={styles.paymentLayout}>
-                    <h1 className={styles.sectionTitle}>Payment Method</h1>
-                    <div className={styles.methodLayout}>
-                        <div className={`${styles.optionSelected} ${paymentMethod === "credit" ? styles.selected: styles.optionUnselected}`}>
-                            <button className={styles.methodButton} onClick={() => {setPaymentMethod("credit"); setPaymentDetails({})}}>Credit Card</button>
-                        </div>
-                        <div className={`${styles.optionSelected} ${paymentMethod === "gift" ? styles.selected: styles.optionUnselected}`}>
-                            <button className={styles.methodButton} onClick={() => {setPaymentMethod("gift"); setPaymentDetails({})}}>Gift Card</button>
-                        </div>
-                        
-                    </div>
-                    <h1 className={styles.sectionTitle}>Card Details</h1>
-                    {paymentMethod === "credit" ? (
-                        <div className={styles.infoLayout}>
-                            <input className={styles.input} name='cardHolder' type='name' placeholder='Cardholder Name' onChange={handlePaymentInputChange}></input>
-                            <input className={styles.input} name='cardNumber' type='number' placeholder='Credit Card Number' pattern='[0-9\s]{13,19}' maxLength='19' onChange={handlePaymentInputChange}></input>
-                            <div className={styles.rowDiv}>
-                                <input className={styles.input} name='cardExp' type='month' placeholder='MM/YYYY' onChange={handlePaymentInputChange}></input>
-                                <input className={styles.input} name='cardCVV' type='number' placeholder='CVV' maxLength={3} onChange={handlePaymentInputChange}></input>
+                    <form onSubmit={handleCheckout}>
+                        <h1 className={styles.sectionTitle}>Payment Method</h1>
+                        <div className={styles.methodLayout}>
+                            <div className={`${styles.optionSelected} ${paymentMethod === "credit" ? styles.selected: styles.optionUnselected}`}>
+                                <button className={styles.methodButton} onClick={() => {setPaymentMethod("credit"); setPaymentDetails({})}}>Credit Card</button>
+                            </div>
+                            <div className={`${styles.optionSelected} ${paymentMethod === "gift" ? styles.selected: styles.optionUnselected}`}>
+                                <button className={styles.methodButton} onClick={() => {setPaymentMethod("gift"); setPaymentDetails({})}}>Gift Card</button>
                             </div>
                             
                         </div>
-                    ) : (
+                        <h1 className={styles.sectionTitle}>Card Details</h1>
+                        {paymentMethod === "credit" ? (
+                            <div className={styles.infoLayout}>
+                                <input required className={styles.input} name='cardHolder' type='name' placeholder='Cardholder Name' onChange={handlePaymentInputChange}></input>
+                                <input required className={styles.input} name='cardNumber' type='text' placeholder='Credit Card Number' pattern='[0-9]{13,19}' onChange={handlePaymentInputChange}></input>
+                                <div className={styles.rowDiv}>
+                                    <input required className={styles.input} name='cardExp' type='month' placeholder='MM/YYYY' pattern='^(0[1-9]|1[0-2])\/\d{4}$' onChange={handlePaymentInputChange}></input>
+                                    <input required className={styles.input} name='cardCVV' type='text' placeholder='CVV' pattern='[0-9]{3}' onChange={handlePaymentInputChange}></input>
+                                </div>
+                                
+                            </div>
+                        ) : (
+                            <div className={styles.infoLayout}>
+                                <input required className={styles.input} name='cardCode' type='text' placeholder='Gift Card Number' onChange={handlePaymentInputChange}></input>
+                            </div>
+                        )}
+                        <h1 className={styles.sectionTitle}>Delivery Instructions</h1>
                         <div className={styles.infoLayout}>
-                            <input className={styles.input} name='cardCode' type='text' placeholder='Gift Card Number' onChange={handlePaymentInputChange}></input>
+                            <input required className={styles.input} name='address_street' type='text' placeholder='Street Address' onChange={handleDeliveryInputChange}></input>
+                            <input required className={styles.input} name='address_city' type='text' placeholder='City' onChange={handleDeliveryInputChange}></input>
+                            <div className={styles.rowDiv}>
+                                <select required className={styles.select} name='address_province' onChange={handleDeliveryInputChange}>
+                                    <option value="" disabled>Province</option>
+                                    <option value="AB">Alberta</option>
+                                    <option value="BC">British Columbia</option>
+                                    <option value="MB">Manitoba</option>
+                                    <option value="NB">New Brunswick</option>
+                                    <option value="NL">Newfoundland and Labrador</option>
+                                    <option value="NT">Northwest Territories</option>
+                                    <option value="NU">Nunavut</option>
+                                    <option value="NS">Nova Scotia</option>
+                                    <option value="ON">Ontario</option>
+                                    <option value="PE">Prince Edward Island</option>
+                                    <option value="QC">Quebec</option>
+                                    <option value="SK">Saskatchewan</option>
+                                    <option value="YT">Yukon</option>
+                                </select>
+                                <input required className={styles.input} name='address_postal_code' type='text' placeholder='Postal Code' pattern='^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$' onChange={handleDeliveryInputChange}></input>
+                            </div>
                         </div>
-                    )}
-                    <h1 className={styles.sectionTitle}>Delivery Instructions</h1>
-                    <div className={styles.infoLayout}>
-                        <input className={styles.input} name='address_street' type='text' placeholder='Street Address' onChange={handleDeliveryInputChange}></input>
-                        <input className={styles.input} name='address_city' type='text' placeholder='City' onChange={handleDeliveryInputChange}></input>
-                        <div className={styles.rowDiv}>
-                            <input className={styles.input} name='address_province' type='text' placeholder='Province' onChange={handleDeliveryInputChange}></input>
-                            <input className={styles.input} name='address_postal_code' type='text' placeholder='Postal Code' pattern='^[A-Za-z]\d[A-Za-z] ?\d[A-Za-z]\d$' onChange={handleDeliveryInputChange}></input>
-                        </div>
-                    </div>
-                    <button className={styles.buttonCheckout} onClick={handleCheckout}>Place Order</button>
+                        <button type='submit' className={styles.buttonCheckout}>Place Order</button>
+                    </form>
+                    
                 </div>
                 
                 

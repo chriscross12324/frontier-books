@@ -32,13 +32,45 @@ a {
     font-weight: 500;
 }
 
-.searchInput {
+.searchContainer {
     height: 40px;
     width: min(25%, 400px);
+    padding: 0 20px;
+}
+
+.searchInput {
+    height: 100%;
+    width: 100%;
     background-color: rgba(255, 255, 255, 0.1);
     border: 2px solid rgba(255, 255, 255, 0.025);
     border-radius: 20px;
-    padding: 0 20px;
+    margin-top: 0;
+}
+
+.suggestionsDropdown {
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.5);
+    width: min(25%, 400px);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    left: calc(50% - (min(25%, 400px) / 2));
+}
+
+.suggestionItem {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 50ms;
+}
+
+.suggestionItem:hover {
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .headerRight {
@@ -140,14 +172,15 @@ a {
     width: 35px;
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.1);
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    transition: background-color 50ms linear;
 }
 
 .buttonCloseCart:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 .iconCloseCart {
@@ -177,6 +210,7 @@ a {
     font-size: 0.8rem;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 50ms linear, border 50ms linear;
 }
 
 .buttonCheckout:hover {

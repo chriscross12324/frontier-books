@@ -80,18 +80,17 @@
     background: #3a3a3a;
     border: none;
     border-radius: 3px 3px 3px 8px;
-    /* Bright yellow */
     color: white;
     height: 40px;
     width: 120px;
     font-size: 0.8rem;
     font-weight: bold;
     cursor: pointer;
+    transition: background-color 0.05s linear;
 }
 
 .product_item button:hover {
     background-color: rgba(0, 129, 13, 1.0);
-    /* Darker orange-yellow */
 }
 
 .cart_containers {
