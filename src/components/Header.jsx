@@ -73,7 +73,7 @@ const Header = ({ books, setFilteredBooks }) => {
                 <div className={styles.headerLogo}>Frontier Books</div>
                 <nav>
                     <Link to="/">Home</Link>
-                    <Link to="/contact">Contact Us</Link>
+                    <Link to="/cat">Cat</Link>
                 </nav>
             </div>
 
