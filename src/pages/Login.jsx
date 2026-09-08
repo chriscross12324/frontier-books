@@ -20,7 +20,7 @@ export default function Login() {
 
         showNotification("Logging In")
 
-        fetch("https://findthefrontier.ca/frontier_books/login", {
+        fetch("https://ember.findthefrontier.ca/frontier_books/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ user_id: 0, user_name: "test", user_email: email, user_password: password, user_role: "user" }),

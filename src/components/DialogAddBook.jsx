@@ -25,7 +25,7 @@ const DialogAddBook = ({ isOpen, onClose }) => {
         setError(null);
 
         try {
-            const response = await fetch("https://findthefrontier.ca/frontier_books/create/book", {
+            const response = await fetch("https://ember.findthefrontier.ca/frontier_books/create/book", {
                 method: "POST",
                 headers: { 
                     "Content-Type": "application/json",

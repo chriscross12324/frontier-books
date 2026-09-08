@@ -7,7 +7,7 @@ const HomePage = () => {
     const [filteredBooks, setFilteredBooks] = useState([]);
 
     useEffect(() => {
-            fetch("https://findthefrontier.ca/frontier_books/books")
+            fetch("https://ember.findthefrontier.ca/frontier_books/books")
                 .then(response => response.json())
                 .then(data => {
                     console.log("API Response: ", data);

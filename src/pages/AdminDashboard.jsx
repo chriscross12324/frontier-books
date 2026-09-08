@@ -55,7 +55,7 @@ export default function AdminDashboard() {
     const fetchData = async (section) => {
         try {
             console.debug("Fetching for: ", section)
-            const response = await fetch(`https://findthefrontier.ca/frontier_books/${section}`, {
+            const response = await fetch(`https://ember.findthefrontier.ca/frontier_books/${section}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
             };
 
             const elementID = idMap[selectedTable] || null;
-            const response = await fetch(`https://findthefrontier.ca/frontier_books/modify/${selectedTable}/${elementID}`, {
+            const response = await fetch(`https://ember.findthefrontier.ca/frontier_books/modify/${selectedTable}/${elementID}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
@@ -123,7 +123,7 @@ export default function AdminDashboard() {
             };
 
             const elementID = idMap[selectedTable] || null;
-            const response = await fetch(`https://findthefrontier.ca/frontier_books/remove/${selectedTable}/${elementID}`, {
+            const response = await fetch(`https://ember.findthefrontier.ca/frontier_books/remove/${selectedTable}/${elementID}`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",

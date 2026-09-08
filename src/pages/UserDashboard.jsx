@@ -39,7 +39,7 @@ export default function UserDashboard() {
     const fetchData = async (section) => {
         try {
             console.debug("Fetching for: ", section)
-            const response = await fetch(`https://findthefrontier.ca/frontier_books/user_orders`, {
+            const response = await fetch(`https://ember.findthefrontier.ca/frontier_books/user_orders`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",

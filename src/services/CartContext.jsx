@@ -18,7 +18,7 @@ export const CartProvider = ({ children }) => {
         if (idList.length <= 0) return null;
     
         try {
-            const response = await fetch("https://findthefrontier.ca/frontier_books/books/details", {
+            const response = await fetch("https://ember.findthefrontier.ca/frontier_books/books/details", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -43,7 +43,7 @@ export const CartProvider = ({ children }) => {
             if (!accessToken) return null;
 
             // Retrieve User's Cart from API
-            const response = await fetch("https://findthefrontier.ca/frontier_books/cart", {
+            const response = await fetch("https://ember.findthefrontier.ca/frontier_books/cart", {
                 headers: { Authorization: `Bearer ${accessToken}` }
             });
 
@@ -85,7 +85,7 @@ export const CartProvider = ({ children }) => {
             const localCart = JSON.parse(localStorage.getItem("cart")) || { items: [] };
 
             // Push Local Cart to Remote
-            const response = await fetch("https://findthefrontier.ca/frontier_books/cart", {
+            const response = await fetch("https://ember.findthefrontier.ca/frontier_books/cart", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

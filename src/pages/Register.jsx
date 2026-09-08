@@ -21,7 +21,7 @@ export default function Register() {
 
         showNotification("Creating Account")
 
-        fetch("https://findthefrontier.ca/frontier_books/users", {
+        fetch("https://ember.findthefrontier.ca/frontier_books/users", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ user_id: 0, user_name: username, user_email: email, user_password: password, user_role: "user" }),

@@ -28,7 +28,7 @@ export default function Checkout() {
         
         //return;
         try {
-            const response = await fetch('https://findthefrontier.ca/frontier_books/checkout', {
+            const response = await fetch('https://ember.findthefrontier.ca/frontier_books/checkout', {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
